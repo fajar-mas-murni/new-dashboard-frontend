@@ -138,7 +138,7 @@ export default function Page() {
       if (startDate) params.append("start-date", startDate);
       if (endDate) params.append("end-date", endDate);
 
-      const response = await fetch(`http://localhost:3030/account-receivable/summary?${params.toString()}`);
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/account-receivable/summary?${params.toString()}`);
 
       if (!response.ok) {
         throw new Error(`Server returned ${response.status} ${response.statusText}`);
@@ -251,7 +251,7 @@ export default function Page() {
                       value={branch}
                       selectedLabel={branchLabel}
                       onValueChange={(val, label) => { setBranch(val); setBranchLabel(label); }}
-                      fetchUrl="http://localhost:3030/master/branch"
+                      fetchUrl={`${process.env.NEXT_PUBLIC_API_URL}/master/branch`}
                       mapOption={mapBranchOption}
                       placeholder="Select branch"
                       allLabel="All Branches"
@@ -268,7 +268,7 @@ export default function Page() {
                       value={customer}
                       selectedLabel={customerLabel}
                       onValueChange={(val, label) => { setCustomer(val); setCustomerLabel(label); }}
-                      fetchUrl="http://localhost:3030/master/customer"
+                      fetchUrl={`${process.env.NEXT_PUBLIC_API_URL}/master/customer`}
                       mapOption={mapCustomerOption}
                       placeholder="Select customer"
                       allLabel="All Customers"
