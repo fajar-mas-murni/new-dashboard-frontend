@@ -13,8 +13,9 @@ interface SearchableSelectProps {
   value: string;
   onValueChange: (value: string, label: string) => void;
   selectedLabel?: string;
-  fetchUrl: string;
-  mapOption: (item: any) => SelectOption;
+  fetchUrl?: string;
+  staticOptions?: SelectOption[];
+  mapOption?: (item: any) => SelectOption;
   placeholder?: string;
   allLabel?: string;
   pageSize?: number;
@@ -27,6 +28,7 @@ export function SearchableSelect({
   onValueChange,
   selectedLabel: externalLabel,
   fetchUrl,
+  staticOptions,
   mapOption,
   placeholder = "Select...",
   allLabel = "All",
@@ -46,6 +48,17 @@ export function SearchableSelect({
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const fetchOptions = useCallback(async (searchTerm: string, pageNum: number) => {
+    if (staticOptions) {
+      const filtered = staticOptions.filter(opt => opt.label.toLowerCase().includes(searchTerm.toLowerCase()));
+      const totalItems = filtered.length;
+      setOptions(filtered.slice((pageNum - 1) * pageSize, pageNum * pageSize));
+      setTotal(totalItems);
+      setTotalPages(Math.ceil(totalItems / pageSize) || 1);
+      return;
+    }
+
+    if (!fetchUrl || !mapOption) return;
+
     setLoading(true);
     try {
       const params = new URLSearchParams();
@@ -53,7 +66,8 @@ export function SearchableSelect({
       params.append("page", String(pageNum));
       params.append("pageSize", String(pageSize));
 
-      const response = await fetch(`${fetchUrl}?${params.toString()}`);
+      const separator = fetchUrl.includes("?") ? "&" : "?";
+      const response = await fetch(`${fetchUrl}${separator}${params.toString()}`);
       const result = await response.json();
 
       if (result.success) {
@@ -68,7 +82,7 @@ export function SearchableSelect({
     } finally {
       setLoading(false);
     }
-  }, [fetchUrl, mapOption, pageSize]);
+  }, [fetchUrl, staticOptions, mapOption, pageSize]);
 
   // Fetch when popover opens or search/page changes
   useEffect(() => {
@@ -129,9 +143,11 @@ export function SearchableSelect({
       <PopoverTrigger
         className={`flex flex-row items-center justify-between text-left font-semibold bg-[#f0f2f5] dark:bg-slate-800 border border-gray-300/80 dark:border-slate-700 hover:bg-gray-250 dark:hover:bg-slate-700 text-xs rounded-xl px-3 py-2 cursor-pointer text-[#2d2e30] dark:text-slate-100 h-9 transition-colors ring-0 outline-none gap-1.5 ${className}`}
       >
-        {icon && <span className="text-gray-500 dark:text-slate-400 flex-shrink-0">{icon}</span>}
-        <span className="truncate">{displayLabel}</span>
-        <ChevronDown className="h-3.5 w-3.5 text-gray-500 dark:text-slate-400 flex-shrink-0" />
+        <div className="flex items-center gap-2 truncate">
+          {icon && <span className="text-gray-500 dark:text-slate-400 flex-shrink-0">{icon}</span>}
+          <span className="truncate">{displayLabel}</span>
+        </div>
+        <ChevronDown className="h-3.5 w-3.5 text-gray-500 dark:text-slate-400 flex-shrink-0 ml-2" />
       </PopoverTrigger>
       <PopoverContent
         className="w-[260px] p-0 border border-gray-200 dark:border-slate-800 shadow-xl rounded-xl bg-white dark:bg-slate-900 z-[100]"
