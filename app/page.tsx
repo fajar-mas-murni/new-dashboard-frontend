@@ -76,8 +76,7 @@ export default function Page() {
   const [paidPage, setPaidPage] = useState<number>(1);
 
   const getDefaultStartDate = () => {
-    const currentYear = new Date().getFullYear();
-    return `${currentYear}-01-01`;
+    return `2024-01-01`;
   };
 
   const getDefaultEndDate = () => {
