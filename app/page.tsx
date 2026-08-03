@@ -22,7 +22,8 @@ interface CustomerSummary {
   "1-30": number;
   "31-60": number;
   "61-90": number;
-  "91-over": number;
+  "91-180": number;
+  "over180": number;
   amountDue: number;
 }
 
@@ -678,7 +679,8 @@ export default function Page() {
                     <th className="px-4 py-2.5 text-right font-bold">1-30</th>
                     <th className="px-4 py-2.5 text-right font-bold">31-60</th>
                     <th className="px-4 py-2.5 text-right font-bold">61-90</th>
-                    <th className="px-4 py-2.5 text-right font-bold">91 & Over</th>
+                    <th className="px-4 py-2.5 text-right font-bold">91-180</th>
+                    <th className="px-4 py-2.5 text-right font-bold">Over 180</th>
                     <th className="px-4 py-2.5 text-right font-bold">Amount Due</th>
                   </tr>
                 </thead>
@@ -687,6 +689,7 @@ export default function Page() {
                     Array.from({ length: 8 }).map((_, i) => (
                       <tr key={i} className="animate-pulse h-11">
                         <td className="px-4 py-3"><div className="h-3 w-24 bg-slate-200 dark:bg-slate-800 rounded"></div></td>
+                        <td className="px-4 py-3"><div className="h-3 w-12 bg-slate-200 dark:bg-slate-800 rounded ml-auto"></div></td>
                         <td className="px-4 py-3"><div className="h-3 w-12 bg-slate-200 dark:bg-slate-800 rounded ml-auto"></div></td>
                         <td className="px-4 py-3"><div className="h-3 w-12 bg-slate-200 dark:bg-slate-800 rounded ml-auto"></div></td>
                         <td className="px-4 py-3"><div className="h-3 w-12 bg-slate-200 dark:bg-slate-800 rounded ml-auto"></div></td>
@@ -706,7 +709,7 @@ export default function Page() {
                     if (filteredSummary.length === 0) {
                       return (
                         <tr>
-                          <td colSpan={7} className="px-4 py-12 text-center text-slate-400 dark:text-slate-500 font-medium h-[352px]">
+                          <td colSpan={8} className="px-4 py-12 text-center text-slate-400 dark:text-slate-500 font-medium h-[352px]">
                             No data found
                           </td>
                         </tr>
@@ -726,7 +729,8 @@ export default function Page() {
                             <td className="px-4 py-3 text-right font-medium text-slate-650 dark:text-slate-350">{item["1-30"] ? formatAmount(item["1-30"]) : "0"}</td>
                             <td className="px-4 py-3 text-right font-medium text-slate-650 dark:text-slate-350">{item["31-60"] ? formatAmount(item["31-60"]) : "0"}</td>
                             <td className="px-4 py-3 text-right font-medium text-slate-650 dark:text-slate-350">{item["61-90"] ? formatAmount(item["61-90"]) : "0"}</td>
-                            <td className="px-4 py-3 text-right font-medium text-slate-650 dark:text-slate-350">{item["91-over"] ? formatAmount(item["91-over"]) : "0"}</td>
+                            <td className="px-4 py-3 text-right font-medium text-slate-650 dark:text-slate-350">{item["91-180"] ? formatAmount(item["91-180"]) : "0"}</td>
+                            <td className="px-4 py-3 text-right font-medium text-slate-650 dark:text-slate-350">{item["over180"] ? formatAmount(item["over180"]) : "0"}</td>
                             <td className="px-4 py-3 text-right font-bold text-slate-800 dark:text-slate-100">{formatAmount(item.amountDue)}</td>
                           </tr>
                         ))}
