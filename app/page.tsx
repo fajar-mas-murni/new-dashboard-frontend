@@ -114,10 +114,29 @@ export default function Page() {
   // Date filters defaulted to Jan 1st of current year and today
   const [startDate, setStartDate] = useState<string>(getDefaultStartDate);
   const [endDate, setEndDate] = useState<string>(getDefaultEndDate);
+  const [category, setCategory] = useState<string>("all");
+  const [categoryLabel, setCategoryLabel] = useState<string>("All Categories");
   const [customer, setCustomer] = useState<string>("all");
   const [customerLabel, setCustomerLabel] = useState<string>("All Customers");
   const [branch, setBranch] = useState<string>("all");
   const [branchLabel, setBranchLabel] = useState<string>("All Branches");
+
+  const ANAK_USAHA = [
+    "mitra atlas nusantara",
+    "fajar bumi harmoni",
+    "fajar mitra harmoni",
+    "fajar rawayan utama"
+  ];
+
+  const isCustomerInCategory = useCallback((customerName: string, cat: string) => {
+    if (cat === "all") return true;
+    if (!customerName) return false;
+    const nameLower = customerName.toLowerCase();
+    const isAnak = ANAK_USAHA.some(au => nameLower.includes(au));
+    if (cat === "anak_usaha") return isAnak;
+    if (cat === "non_anak_usaha") return !isAnak;
+    return true;
+  }, []);
 
   const mapBranchOption = useCallback((item: any) => ({
     value: String(item.BranchName),
@@ -169,7 +188,7 @@ export default function Page() {
     setSummaryPage(1);
     setUnpaidPage(1);
     setPaidPage(1);
-  }, [customer]);
+  }, [customer, category]);
 
   // Formatter displaying the original raw value in Indonesian locale format
   const formatAmount = (value: number) => {
@@ -235,7 +254,7 @@ export default function Page() {
               <DialogTrigger className="flex items-center gap-2 px-4 py-2 bg-[#f0f2f5] dark:bg-slate-800 hover:bg-gray-200 dark:hover:bg-slate-700 border border-gray-300/80 dark:border-slate-700 hover:border-theme-orange/20 hover:text-theme-orange text-gray-700 dark:text-slate-200 font-semibold rounded-xl text-xs transition-colors h-9 cursor-pointer">
                 <Filter className="w-4 h-4" />
                 Filters
-                {(customer !== "all" || branch !== "all" || startDate !== getDefaultStartDate() || endDate !== getDefaultEndDate()) && (
+                {(category !== "all" || customer !== "all" || branch !== "all" || startDate !== getDefaultStartDate() || endDate !== getDefaultEndDate()) && (
                   <span className="flex items-center justify-center bg-theme-orange text-white w-4 h-4 rounded-full text-[9px] font-bold">!</span>
                 )}
               </DialogTrigger>
@@ -261,6 +280,29 @@ export default function Page() {
                     />
                   </div>
 
+                  {/* Category Filter */}
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-xs text-slate-500 dark:text-slate-400 font-medium">Category:</label>
+                    <SearchableSelect
+                      value={category}
+                      selectedLabel={categoryLabel}
+                      onValueChange={(val, label) => {
+                        setCategory(val);
+                        setCategoryLabel(label);
+                        setCustomer("all");
+                        setCustomerLabel("All Customers");
+                      }}
+                      staticOptions={[
+                        { value: "anak_usaha", label: "Anak Usaha" },
+                        { value: "non_anak_usaha", label: "Non Anak Usaha" }
+                      ]}
+                      placeholder="Select category"
+                      allLabel="All Customers"
+                      className="w-full"
+                      icon={<Users className="w-4 h-4" />}
+                    />
+                  </div>
+
                   {/* Customer Filter */}
                   <div className="flex flex-col gap-1.5">
                     <label className="text-xs text-slate-500 dark:text-slate-400 font-medium">Customer:</label>
@@ -268,7 +310,7 @@ export default function Page() {
                       value={customer}
                       selectedLabel={customerLabel}
                       onValueChange={(val, label) => { setCustomer(val); setCustomerLabel(label); }}
-                      fetchUrl={`${process.env.NEXT_PUBLIC_API_URL}/master/customer`}
+                      fetchUrl={`${process.env.NEXT_PUBLIC_API_URL}/master/customer?category=${category}`}
                       mapOption={mapCustomerOption}
                       placeholder="Select customer"
                       allLabel="All Customers"
@@ -325,6 +367,8 @@ export default function Page() {
                     onClick={() => {
                       setStartDate(getDefaultStartDate());
                       setEndDate(getDefaultEndDate());
+                      setCategory("all");
+                      setCategoryLabel("All Customers");
                       setCustomer("all");
                       setCustomerLabel("All Customers");
                       setBranch("all");
@@ -363,7 +407,8 @@ export default function Page() {
           const rawSummary = data?.summary || [];
           const branchFilteredSummary = rawSummary.filter((item: any) =>
             (branch === "all" || String(item.branch) === String(branch)) &&
-            (customer === "all" || item.customer === customer)
+            (customer === "all" || item.customer === customer) &&
+            isCustomerInCategory(item.customer, category)
           );
           const currentSummary = branchFilteredSummary.reduce((acc: any, curr: any) => ({
             "unpaid-invoice": acc["unpaid-invoice"] + (curr["unpaid-invoice"] || 0),
@@ -501,7 +546,10 @@ export default function Page() {
           </Card>
         ) : (() => {
           const rawTop = data?.["top-10-unpaid-customers"] || [];
-          const branchFilteredTop = rawTop.filter((item: any) => branch === "all" || String(item.branch) === String(branch));
+          const branchFilteredTop = rawTop.filter((item: any) =>
+            (branch === "all" || String(item.branch) === String(branch)) &&
+            isCustomerInCategory(item.customer, category)
+          );
           const topMap = new Map();
           branchFilteredTop.forEach((item: any) => {
             const cust = item.customer;
@@ -699,7 +747,7 @@ export default function Page() {
                     ))
                   ) : (() => {
                     const summaryCustomers = data?.["summary-customer"] || [];
-                    const filteredSummary = summaryCustomers.filter(item => (customer === "all" || item.customer === customer) && (branch === "all" || String(item.branch) === String(branch)));
+                    const filteredSummary = summaryCustomers.filter(item => (customer === "all" || item.customer === customer) && (branch === "all" || String(item.branch) === String(branch)) && isCustomerInCategory(item.customer, category));
                     const itemsPerPage = 8;
                     const totalSummaryPages = Math.ceil(filteredSummary.length / itemsPerPage) || 1;
                     const paginatedSummary = filteredSummary.slice((summaryPage - 1) * itemsPerPage, summaryPage * itemsPerPage);
@@ -743,7 +791,7 @@ export default function Page() {
             {/* Table Footer */}
             {!loading && (() => {
               const summaryCustomers = data?.["summary-customer"] || [];
-              const filteredSummary = summaryCustomers.filter(item => (customer === "all" || item.customer === customer) && (branch === "all" || String(item.branch) === String(branch)));
+              const filteredSummary = summaryCustomers.filter(item => (customer === "all" || item.customer === customer) && (branch === "all" || String(item.branch) === String(branch)) && isCustomerInCategory(item.customer, category));
               const itemsPerPage = 8;
               const totalSummaryPages = Math.ceil(filteredSummary.length / itemsPerPage) || 1;
               const totalSummaryAmountDue = filteredSummary.reduce((sum, item) => sum + (item.amountDue || 0), 0);
@@ -812,7 +860,7 @@ export default function Page() {
                     ))
                   ) : (() => {
                     const unpaidInvoices = data?.["summary-unpaid"] || [];
-                    const filteredUnpaid = unpaidInvoices.filter(item => (customer === "all" || item.customer === customer) && (branch === "all" || String(item.branch) === String(branch)));
+                    const filteredUnpaid = unpaidInvoices.filter(item => (customer === "all" || item.customer === customer) && (branch === "all" || String(item.branch) === String(branch)) && isCustomerInCategory(item.customer, category));
                     const itemsPerPage = 8;
                     const totalUnpaidPages = Math.ceil(filteredUnpaid.length / itemsPerPage) || 1;
                     const paginatedUnpaid = filteredUnpaid.slice((unpaidPage - 1) * itemsPerPage, unpaidPage * itemsPerPage);
@@ -852,7 +900,7 @@ export default function Page() {
             {/* Table Footer */}
             {!loading && (() => {
               const unpaidInvoices = data?.["summary-unpaid"] || [];
-              const filteredUnpaid = unpaidInvoices.filter(item => (customer === "all" || item.customer === customer) && (branch === "all" || String(item.branch) === String(branch)));
+              const filteredUnpaid = unpaidInvoices.filter(item => (customer === "all" || item.customer === customer) && (branch === "all" || String(item.branch) === String(branch)) && isCustomerInCategory(item.customer, category));
               const itemsPerPage = 8;
               const totalUnpaidPages = Math.ceil(filteredUnpaid.length / itemsPerPage) || 1;
               const totalUnpaidAmountDue = filteredUnpaid.reduce((sum, item) => sum + (item.amountDue || 0), 0);
@@ -924,7 +972,7 @@ export default function Page() {
                       ))
                     ) : (() => {
                       const paidInvoices = data?.["paid-invoices-summary"] || [];
-                      const filteredPaid = paidInvoices.filter(item => (customer === "all" || item.customer === customer) && (branch === "all" || String(item.branch) === String(branch)));
+                      const filteredPaid = paidInvoices.filter(item => (customer === "all" || item.customer === customer) && (branch === "all" || String(item.branch) === String(branch)) && isCustomerInCategory(item.customer, category));
                       const groupedPaidMap = new Map();
                       filteredPaid.forEach((item: any) => {
                         if (!groupedPaidMap.has(item.customer)) {
@@ -1012,7 +1060,7 @@ export default function Page() {
               {/* Table Footer */}
               {!loading && (() => {
                 const paidInvoices = data?.["paid-invoices-summary"] || [];
-                const filteredPaid = paidInvoices.filter(item => (customer === "all" || item.customer === customer) && (branch === "all" || String(item.branch) === String(branch)));
+                const filteredPaid = paidInvoices.filter(item => (customer === "all" || item.customer === customer) && (branch === "all" || String(item.branch) === String(branch)) && isCustomerInCategory(item.customer, category));
                 const groupedPaidMap = new Map();
                 filteredPaid.forEach((item: any) => {
                   if (!groupedPaidMap.has(item.customer)) {
@@ -1086,7 +1134,7 @@ export default function Page() {
                   </div>
                 ) : (() => {
                   const paidInvoices = data?.["paid-invoices-summary"] || [];
-                  const filteredPaid = paidInvoices.filter(item => (customer === "all" || item.customer === customer) && (branch === "all" || String(item.branch) === String(branch)));
+                  const filteredPaid = paidInvoices.filter(item => (customer === "all" || item.customer === customer) && (branch === "all" || String(item.branch) === String(branch)) && isCustomerInCategory(item.customer, category));
 
                   const groupedPaidMap = new Map();
                   filteredPaid.forEach((item: any) => {
