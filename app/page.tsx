@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { RefreshCw, Calendar, AlertCircle, FileText, Clock, CalendarDays, Inbox, BarChart3, FileSpreadsheet, Receipt, Building2, Users, Filter } from "lucide-react";
+import { RefreshCw, Calendar, AlertCircle, FileText, Clock, CalendarDays, Inbox, BarChart3, FileSpreadsheet, Receipt, Building2, Users, Filter, ChevronLeft, ChevronRight } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
@@ -51,6 +51,17 @@ interface PaidVsUnpaidMonthly {
   unpaid: number;
 }
 
+interface CustomerInvoice {
+  customer: string;
+  invoiceNo: string;
+  date: string;
+  dueDate: string;
+  currency: string;
+  amountInCurrency: number;
+  amountInHomeCurrency: number;
+  amountDueInHomeCurrency: number;
+}
+
 interface ArSummaryResponse {
   summary: {
     branch: string;
@@ -65,6 +76,7 @@ interface ArSummaryResponse {
   "summary-unpaid": UnpaidInvoice[];
   "paid-invoices-summary": PaidInvoiceSummary[];
   "paid-vs-unpaid-monthly": PaidVsUnpaidMonthly[];
+  "customer-invoices": CustomerInvoice[];
 }
 
 export default function Page() {
@@ -74,6 +86,7 @@ export default function Page() {
   const [summaryPage, setSummaryPage] = useState<number>(1);
   const [unpaidPage, setUnpaidPage] = useState<number>(1);
   const [paidPage, setPaidPage] = useState<number>(1);
+  const [customerInvoicesPage, setCustomerInvoicesPage] = useState<number>(1);
 
   const getDefaultStartDate = () => {
     return `2024-01-01`;
@@ -188,6 +201,7 @@ export default function Page() {
     setSummaryPage(1);
     setUnpaidPage(1);
     setPaidPage(1);
+    setCustomerInvoicesPage(1);
   }, [customer, category]);
 
   // Formatter displaying the original raw value in Indonesian locale format
@@ -1413,6 +1427,125 @@ export default function Page() {
                 );
               })()}
             </CardContent>
+          </Card>
+
+          {/* Customer Invoices Table */}
+          <Card className="bg-white/95 dark:bg-slate-900/95 rounded-2xl border border-gray-200/80 dark:border-slate-800/40 shadow-sm overflow-hidden flex flex-col h-[500px] mt-8 mb-4">
+            <CardHeader className="px-5 py-4 flex flex-row items-center gap-2.5 flex-shrink-0">
+              <FileSpreadsheet className="w-5 h-5 text-theme-orange" />
+              <CardTitle className="text-lg font-bold text-slate-800 dark:text-white flex items-center flex-wrap gap-x-1">
+                Customer Invoices <span className="text-sm font-normal italic text-slate-500 tracking-normal">in home currency</span>
+              </CardTitle>
+            </CardHeader>
+            <Separator />
+            <div className="overflow-auto flex-1 text-slate-800 dark:text-slate-100" style={{ scrollbarGutter: "stable" }}>
+              <table className="w-full text-left border-collapse whitespace-nowrap">
+                <thead>
+                  <tr className="bg-[#1A3644] text-white text-[10px] uppercase font-bold tracking-wider h-10 sticky top-0 z-10">
+                    <th className="px-4 py-2.5 font-bold">CUSTOMER</th>
+                    <th className="px-4 py-2.5 font-bold">INVOICE NO.</th>
+                    <th className="px-4 py-2.5 font-bold">DATE</th>
+                    <th className="px-4 py-2.5 font-bold">DUE DATE</th>
+                    <th className="px-4 py-2.5 font-bold">CURRENCY</th>
+                    <th className="px-4 py-2.5 text-right font-bold">AMOUNT IN CURRENCY</th>
+                    <th className="px-4 py-2.5 text-right font-bold">AMOUNT IN HOME CURRENCY</th>
+                    <th className="px-4 py-2.5 text-right font-bold">AMOUNT DUE IN HOME CURRENCY</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100 dark:divide-slate-800/50 text-xs">
+                  {loading ? (
+                    Array.from({ length: 8 }).map((_, i) => (
+                      <tr key={i} className="animate-pulse h-11">
+                        <td className="px-4 py-3"><div className="h-3 w-24 bg-slate-200 dark:bg-slate-800 rounded"></div></td>
+                        <td className="px-4 py-3"><div className="h-3 w-16 bg-slate-200 dark:bg-slate-800 rounded"></div></td>
+                        <td className="px-4 py-3"><div className="h-3 w-14 bg-slate-200 dark:bg-slate-800 rounded"></div></td>
+                        <td className="px-4 py-3"><div className="h-3 w-14 bg-slate-200 dark:bg-slate-800 rounded"></div></td>
+                        <td className="px-4 py-3"><div className="h-3 w-10 bg-slate-200 dark:bg-slate-800 rounded"></div></td>
+                        <td className="px-4 py-3"><div className="h-3 w-16 bg-slate-200 dark:bg-slate-800 rounded ml-auto"></div></td>
+                        <td className="px-4 py-3"><div className="h-3 w-16 bg-slate-200 dark:bg-slate-800 rounded ml-auto"></div></td>
+                        <td className="px-4 py-3"><div className="h-3 w-16 bg-slate-200 dark:bg-slate-800 rounded ml-auto"></div></td>
+                      </tr>
+                    ))
+                  ) : (() => {
+                    const allInvoices = data?.["customer-invoices"] || [];
+                    const filteredInvoices = allInvoices.filter(item => (customer === "all" || item.customer === customer) && isCustomerInCategory(item.customer, category));
+
+                    const itemsPerPage = 8;
+                    const paginatedInvoices = filteredInvoices.slice((customerInvoicesPage - 1) * itemsPerPage, customerInvoicesPage * itemsPerPage);
+
+                    if (filteredInvoices.length === 0) {
+                      return (
+                        <tr>
+                          <td colSpan={8} className="px-4 py-12 text-center text-slate-400 dark:text-slate-500 font-medium h-[352px]">
+                            No data found
+                          </td>
+                        </tr>
+                      );
+                    }
+
+                    return (
+                      <>
+                        {paginatedInvoices.map((item, idx) => (
+                          <tr
+                            key={idx}
+                            className="hover:bg-slate-50 dark:hover:bg-slate-800/20 transition-colors even:bg-slate-50/30 dark:even:bg-slate-800/5 h-11"
+                          >
+                            <td className="px-4 py-3 font-semibold text-slate-700 dark:text-slate-300 truncate max-w-[150px]" title={item.customer}>{item.customer}</td>
+                            <td className="px-4 py-3 font-medium text-slate-650 dark:text-slate-350">{item.invoiceNo}</td>
+                            <td className="px-4 py-3 font-medium text-slate-650 dark:text-slate-350">{formatDate(item.date)}</td>
+                            <td className="px-4 py-3 font-medium text-slate-650 dark:text-slate-350">{formatDate(item.dueDate)}</td>
+                            <td className="px-4 py-3 font-medium text-slate-650 dark:text-slate-350">{item.currency}</td>
+                            <td className="px-4 py-3 text-right font-medium text-slate-650 dark:text-slate-350">{formatAmount(item.amountInCurrency)}</td>
+                            <td className="px-4 py-3 text-right font-medium text-slate-650 dark:text-slate-350">{formatAmount(item.amountInHomeCurrency)}</td>
+                            <td className="px-4 py-3 text-right font-bold text-slate-800 dark:text-slate-100">{formatAmount(item.amountDueInHomeCurrency)}</td>
+                          </tr>
+                        ))}
+                      </>
+                    );
+                  })()}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Table Footer */}
+            {!loading && (() => {
+              const allInvoices = data?.["customer-invoices"] || [];
+              const filteredInvoices = allInvoices.filter(item => (customer === "all" || item.customer === customer) && isCustomerInCategory(item.customer, category));
+              const itemsPerPage = 8;
+              const totalPages = Math.ceil(filteredInvoices.length / itemsPerPage) || 1;
+              const totalAmtHome = filteredInvoices.reduce((sum, item) => sum + (item.amountInHomeCurrency || 0), 0);
+
+              if (filteredInvoices.length === 0) return null;
+
+              return (
+                <div className="border-t border-gray-100 dark:border-slate-850 px-4 py-3 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs bg-slate-50/50 dark:bg-slate-900/30 mt-auto">
+                  <div className="font-bold text-slate-700 dark:text-slate-300">
+                    Total keseluruhan: <span className="text-theme-orange ml-1">{formatAmount(totalAmtHome)}</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className="text-slate-500">
+                      {(customerInvoicesPage - 1) * itemsPerPage + 1}-{Math.min(customerInvoicesPage * itemsPerPage, filteredInvoices.length)} / {filteredInvoices.length}
+                    </span>
+                    <div className="flex items-center gap-1">
+                      <button
+                        onClick={() => setCustomerInvoicesPage(p => Math.max(1, p - 1))}
+                        disabled={customerInvoicesPage === 1}
+                        className="p-1 rounded border border-gray-255 dark:border-slate-700 hover:bg-white dark:hover:bg-slate-800 disabled:opacity-40 transition-colors cursor-pointer"
+                      >
+                        &lt;
+                      </button>
+                      <button
+                        onClick={() => setCustomerInvoicesPage(p => Math.min(totalPages, p + 1))}
+                        disabled={customerInvoicesPage === totalPages}
+                        className="p-1 rounded border border-gray-255 dark:border-slate-700 hover:bg-white dark:hover:bg-slate-800 disabled:opacity-40 transition-colors cursor-pointer"
+                      >
+                        &gt;
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
           </Card>
 
         </div>
