@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { RefreshCw, Calendar, AlertCircle, FileText, Clock, CalendarDays, Inbox, BarChart3, FileSpreadsheet, Receipt, Building2, Users, Filter, ChevronLeft, ChevronRight } from "lucide-react";
+import { RefreshCw, Calendar, AlertCircle, FileText, Clock, CalendarDays, Inbox, BarChart3, FileSpreadsheet, Receipt, Building2, Users, Filter, ChevronLeft, ChevronRight, Search, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
@@ -101,6 +101,95 @@ export default function Page() {
   const [summaryModalPage, setSummaryModalPage] = useState<number>(1);
   const [unpaidModalPage, setUnpaidModalPage] = useState<number>(1);
   const [mounted, setMounted] = useState<boolean>(false);
+
+  // Search & Sort states for datatables
+  const [summarySearch, setSummarySearch] = useState<string>("");
+  const [summarySortCol, setSummarySortCol] = useState<keyof CustomerSummary>("amountDue");
+  const [summarySortDir, setSummarySortDir] = useState<"asc" | "desc">("desc");
+
+  const [unpaidSearch, setUnpaidSearch] = useState<string>("");
+  const [unpaidSortCol, setUnpaidSortCol] = useState<keyof UnpaidInvoice>("amountDue");
+  const [unpaidSortDir, setUnpaidSortDir] = useState<"asc" | "desc">("desc");
+
+  const [custInvoicesSearch, setCustInvoicesSearch] = useState<string>("");
+  const [custInvoicesSortCol, setCustInvoicesSortCol] = useState<keyof CustomerInvoice>("amountDueInHomeCurrency");
+  const [custInvoicesSortDir, setCustInvoicesSortDir] = useState<"asc" | "desc">("desc");
+
+  const [umcSearch, setUmcSearch] = useState<string>("");
+  const [umcSortCol, setUmcSortCol] = useState<keyof UmcItem>("amountInHomeCurrency");
+  const [umcSortDir, setUmcSortDir] = useState<"asc" | "desc">("desc");
+
+  const [paidSearch, setPaidSearch] = useState<string>("");
+  const [paidSortCol, setPaidSortCol] = useState<string>("last12Month");
+  const [paidSortDir, setPaidSortDir] = useState<"asc" | "desc">("desc");
+
+  const sortData = useCallback(<T,>(data: T[], col: keyof T, dir: "asc" | "desc"): T[] => {
+    return [...data].sort((a, b) => {
+      let valA = a[col];
+      let valB = b[col];
+
+      if (valA === null || valA === undefined) return 1;
+      if (valB === null || valB === undefined) return -1;
+
+      if (typeof valA === "number" && typeof valB === "number") {
+        return dir === "asc" ? valA - valB : valB - valA;
+      }
+
+      const strA = String(valA).toLowerCase();
+      const strB = String(valB).toLowerCase();
+
+      if (strA < strB) return dir === "asc" ? -1 : 1;
+      if (strA > strB) return dir === "asc" ? 1 : -1;
+      return 0;
+    });
+  }, []);
+
+  const handleToggleSort = <T extends string>(
+    col: T,
+    currentCol: T,
+    currentDir: "asc" | "desc",
+    setCol: (c: T) => void,
+    setDir: (d: "asc" | "desc") => void
+  ) => {
+    if (currentCol === col) {
+      setDir(currentDir === "asc" ? "desc" : "asc");
+    } else {
+      setCol(col);
+      setDir("desc");
+    }
+  };
+
+  const renderSortableHeader = (
+    label: string,
+    colKey: any,
+    currentCol: any,
+    currentDir: "asc" | "desc",
+    onSort: (col: any) => void,
+    align: "left" | "right" = "left"
+  ) => {
+    const isSorted = currentCol === colKey;
+    return (
+      <th
+        onClick={() => onSort(colKey)}
+        className={`px-4 py-2.5 font-bold cursor-pointer hover:bg-white/10 transition-colors select-none group/th ${
+          align === "right" ? "text-right" : "text-left"
+        }`}
+      >
+        <div className={`flex items-center gap-1 ${align === "right" ? "justify-end" : "justify-start"}`}>
+          <span>{label}</span>
+          {isSorted ? (
+            currentDir === "asc" ? (
+              <ArrowUp className="w-3 h-3 text-theme-orange flex-shrink-0" />
+            ) : (
+              <ArrowDown className="w-3 h-3 text-theme-orange flex-shrink-0" />
+            )
+          ) : (
+            <ArrowUpDown className="w-3 h-3 opacity-30 group-hover/th:opacity-100 flex-shrink-0 transition-opacity" />
+          )}
+        </div>
+      </th>
+    );
+  };
 
   useEffect(() => {
     setMounted(true);
@@ -756,14 +845,14 @@ export default function Page() {
               <table className="w-full text-left border-collapse whitespace-nowrap">
                 <thead>
                   <tr className="bg-theme-brown text-white text-[10px] uppercase font-bold tracking-wider h-10 sticky top-0 z-10">
-                    <th className="px-4 py-2.5 font-bold">Customer</th>
-                    <th className="px-4 py-2.5 text-right font-bold">Current</th>
-                    <th className="px-4 py-2.5 text-right font-bold">1-30</th>
-                    <th className="px-4 py-2.5 text-right font-bold">31-60</th>
-                    <th className="px-4 py-2.5 text-right font-bold">61-90</th>
-                    <th className="px-4 py-2.5 text-right font-bold">91-180</th>
-                    <th className="px-4 py-2.5 text-right font-bold">Over 180</th>
-                    <th className="px-4 py-2.5 text-right font-bold">Amount Due</th>
+                    {renderSortableHeader("Customer", "customer", summarySortCol, summarySortDir, (c) => handleToggleSort(c, summarySortCol, summarySortDir, setSummarySortCol, setSummarySortDir), "left")}
+                    {renderSortableHeader("Current", "current", summarySortCol, summarySortDir, (c) => handleToggleSort(c, summarySortCol, summarySortDir, setSummarySortCol, setSummarySortDir), "right")}
+                    {renderSortableHeader("1-30", "1-30", summarySortCol, summarySortDir, (c) => handleToggleSort(c, summarySortCol, summarySortDir, setSummarySortCol, setSummarySortDir), "right")}
+                    {renderSortableHeader("31-60", "31-60", summarySortCol, summarySortDir, (c) => handleToggleSort(c, summarySortCol, summarySortDir, setSummarySortCol, setSummarySortDir), "right")}
+                    {renderSortableHeader("61-90", "61-90", summarySortCol, summarySortDir, (c) => handleToggleSort(c, summarySortCol, summarySortDir, setSummarySortCol, setSummarySortDir), "right")}
+                    {renderSortableHeader("91-180", "91-180", summarySortCol, summarySortDir, (c) => handleToggleSort(c, summarySortCol, summarySortDir, setSummarySortCol, setSummarySortDir), "right")}
+                    {renderSortableHeader("Over 180", "over180", summarySortCol, summarySortDir, (c) => handleToggleSort(c, summarySortCol, summarySortDir, setSummarySortCol, setSummarySortDir), "right")}
+                    {renderSortableHeader("Amount Due", "amountDue", summarySortCol, summarySortDir, (c) => handleToggleSort(c, summarySortCol, summarySortDir, setSummarySortCol, setSummarySortDir), "right")}
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100 dark:divide-slate-800/50 text-xs">
@@ -782,8 +871,13 @@ export default function Page() {
                     ))
                   ) : (() => {
                     const summaryCustomers = data?.["summary-customer"] || [];
-                    const filteredSummary = summaryCustomers.filter(item => (customer === "all" || item.customer === customer) && (branch === "all" || String(item.branch) === String(branch)) && isCustomerInCategory(item.customer, category));
-                    const top10Summary = [...filteredSummary].sort((a, b) => (b.amountDue || 0) - (a.amountDue || 0)).slice(0, 10);
+                    const filteredSummary = summaryCustomers.filter(item =>
+                      (customer === "all" || item.customer === customer) &&
+                      (branch === "all" || String(item.branch) === String(branch)) &&
+                      isCustomerInCategory(item.customer, category)
+                    );
+                    const sortedSummary = sortData(filteredSummary, summarySortCol, summarySortDir);
+                    const top10Summary = sortedSummary.slice(0, 10);
 
                     if (top10Summary.length === 0) {
                       return (
@@ -823,14 +917,23 @@ export default function Page() {
             {/* Table Footer with Modal */}
             {!loading && (() => {
               const summaryCustomers = data?.["summary-customer"] || [];
-              const filteredSummary = summaryCustomers.filter(item => (customer === "all" || item.customer === customer) && (branch === "all" || String(item.branch) === String(branch)) && isCustomerInCategory(item.customer, category));
-              const totalSummaryAmountDue = filteredSummary.reduce((sum, item) => sum + (item.amountDue || 0), 0);
+              const filteredSummaryBase = summaryCustomers.filter(item =>
+                (customer === "all" || item.customer === customer) &&
+                (branch === "all" || String(item.branch) === String(branch)) &&
+                isCustomerInCategory(item.customer, category)
+              );
+              const totalSummaryAmountDue = filteredSummaryBase.reduce((sum, item) => sum + (item.amountDue || 0), 0);
+
+              const filteredSummaryModal = filteredSummaryBase.filter(item =>
+                !summarySearch || item.customer.toLowerCase().includes(summarySearch.toLowerCase())
+              );
+              const sortedSummaryModal = sortData(filteredSummaryModal, summarySortCol, summarySortDir);
 
               const itemsPerPageModal = 10;
-              const totalSummaryPagesModal = Math.ceil(filteredSummary.length / itemsPerPageModal) || 1;
-              const paginatedSummaryModal = filteredSummary.slice((summaryModalPage - 1) * itemsPerPageModal, summaryModalPage * itemsPerPageModal);
+              const totalSummaryPagesModal = Math.ceil(sortedSummaryModal.length / itemsPerPageModal) || 1;
+              const paginatedSummaryModal = sortedSummaryModal.slice((summaryModalPage - 1) * itemsPerPageModal, summaryModalPage * itemsPerPageModal);
 
-              if (filteredSummary.length === 0) return null;
+              if (filteredSummaryBase.length === 0) return null;
 
               return (
                 <div className="border-t border-gray-100 dark:border-slate-850 px-4 py-3 flex items-center justify-between text-xs bg-slate-50/50 dark:bg-slate-900/30 mt-auto">
@@ -844,24 +947,34 @@ export default function Page() {
                       </span>
                     </DialogTrigger>
                     <DialogContent className="sm:max-w-[90vw] lg:max-w-6xl w-full max-h-[88vh] flex flex-col bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-2xl p-0 overflow-hidden z-[70]">
-                      <DialogHeader className="px-6 py-4 border-b border-gray-100 dark:border-slate-800 flex-shrink-0">
+                      <DialogHeader className="px-6 py-4 border-b border-gray-100 dark:border-slate-800 flex-shrink-0 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                         <DialogTitle className="text-lg font-bold text-slate-800 dark:text-white flex items-center gap-2">
                           <FileSpreadsheet className="w-5 h-5 text-theme-orange" />
                           Detail Summary Customers <span className="text-sm font-normal italic text-slate-500 tracking-normal">in home currency</span>
                         </DialogTitle>
+                        <div className="relative w-full sm:w-56">
+                          <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                          <input
+                            type="text"
+                            placeholder="Cari customer..."
+                            value={summarySearch}
+                            onChange={(e) => setSummarySearch(e.target.value)}
+                            className="w-full text-xs pl-8 pr-3 py-1.5 rounded-lg border border-gray-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-200 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-theme-orange"
+                          />
+                        </div>
                       </DialogHeader>
                       <div className="overflow-auto flex-1 p-6">
                         <table className="w-full text-left border-collapse whitespace-nowrap text-xs">
                           <thead>
                             <tr className="bg-theme-brown text-white text-[10px] uppercase font-bold tracking-wider h-10 sticky top-0 z-10">
-                              <th className="px-4 py-2.5 font-bold">Customer</th>
-                              <th className="px-4 py-2.5 text-right font-bold">Current</th>
-                              <th className="px-4 py-2.5 text-right font-bold">1-30</th>
-                              <th className="px-4 py-2.5 text-right font-bold">31-60</th>
-                              <th className="px-4 py-2.5 text-right font-bold">61-90</th>
-                              <th className="px-4 py-2.5 text-right font-bold">91-180</th>
-                              <th className="px-4 py-2.5 text-right font-bold">Over 180</th>
-                              <th className="px-4 py-2.5 text-right font-bold">Amount Due</th>
+                              {renderSortableHeader("Customer", "customer", summarySortCol, summarySortDir, (c) => handleToggleSort(c, summarySortCol, summarySortDir, setSummarySortCol, setSummarySortDir), "left")}
+                              {renderSortableHeader("Current", "current", summarySortCol, summarySortDir, (c) => handleToggleSort(c, summarySortCol, summarySortDir, setSummarySortCol, setSummarySortDir), "right")}
+                              {renderSortableHeader("1-30", "1-30", summarySortCol, summarySortDir, (c) => handleToggleSort(c, summarySortCol, summarySortDir, setSummarySortCol, setSummarySortDir), "right")}
+                              {renderSortableHeader("31-60", "31-60", summarySortCol, summarySortDir, (c) => handleToggleSort(c, summarySortCol, summarySortDir, setSummarySortCol, setSummarySortDir), "right")}
+                              {renderSortableHeader("61-90", "61-90", summarySortCol, summarySortDir, (c) => handleToggleSort(c, summarySortCol, summarySortDir, setSummarySortCol, setSummarySortDir), "right")}
+                              {renderSortableHeader("91-180", "91-180", summarySortCol, summarySortDir, (c) => handleToggleSort(c, summarySortCol, summarySortDir, setSummarySortCol, setSummarySortDir), "right")}
+                              {renderSortableHeader("Over 180", "over180", summarySortCol, summarySortDir, (c) => handleToggleSort(c, summarySortCol, summarySortDir, setSummarySortCol, setSummarySortDir), "right")}
+                              {renderSortableHeader("Amount Due", "amountDue", summarySortCol, summarySortDir, (c) => handleToggleSort(c, summarySortCol, summarySortDir, setSummarySortCol, setSummarySortDir), "right")}
                             </tr>
                           </thead>
                           <tbody className="divide-y divide-gray-100 dark:divide-slate-800/50">
@@ -886,7 +999,7 @@ export default function Page() {
                         </div>
                         <div className="flex items-center gap-3">
                           <span className="text-slate-500">
-                            {(summaryModalPage - 1) * itemsPerPageModal + 1}-{Math.min(summaryModalPage * itemsPerPageModal, filteredSummary.length)} / {filteredSummary.length}
+                            {(summaryModalPage - 1) * itemsPerPageModal + 1}-{Math.min(summaryModalPage * itemsPerPageModal, sortedSummaryModal.length)} / {sortedSummaryModal.length}
                           </span>
                           <div className="flex items-center gap-1">
                             <button
@@ -929,11 +1042,11 @@ export default function Page() {
               <table className="w-full text-left border-collapse whitespace-nowrap">
                 <thead>
                   <tr className="bg-[#1A3644] text-white text-[10px] uppercase font-bold tracking-wider h-10 sticky top-0 z-10">
-                    <th className="px-4 py-2.5 font-bold">Customer</th>
-                    <th className="px-4 py-2.5 font-bold">Number</th>
-                    <th className="px-4 py-2.5 font-bold">Date</th>
-                    <th className="px-4 py-2.5 font-bold">Due Date</th>
-                    <th className="px-4 py-2.5 text-right font-bold">Amount Due</th>
+                    {renderSortableHeader("Customer", "customer", unpaidSortCol, unpaidSortDir, (c) => handleToggleSort(c, unpaidSortCol, unpaidSortDir, setUnpaidSortCol, setUnpaidSortDir), "left")}
+                    {renderSortableHeader("Number", "number", unpaidSortCol, unpaidSortDir, (c) => handleToggleSort(c, unpaidSortCol, unpaidSortDir, setUnpaidSortCol, setUnpaidSortDir), "left")}
+                    {renderSortableHeader("Date", "date", unpaidSortCol, unpaidSortDir, (c) => handleToggleSort(c, unpaidSortCol, unpaidSortDir, setUnpaidSortCol, setUnpaidSortDir), "left")}
+                    {renderSortableHeader("Due Date", "dueDate", unpaidSortCol, unpaidSortDir, (c) => handleToggleSort(c, unpaidSortCol, unpaidSortDir, setUnpaidSortCol, setUnpaidSortDir), "left")}
+                    {renderSortableHeader("Amount Due", "amountDue", unpaidSortCol, unpaidSortDir, (c) => handleToggleSort(c, unpaidSortCol, unpaidSortDir, setUnpaidSortCol, setUnpaidSortDir), "right")}
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100 dark:divide-slate-800/50 text-xs">
@@ -949,8 +1062,13 @@ export default function Page() {
                     ))
                   ) : (() => {
                     const unpaidInvoices = data?.["summary-unpaid"] || [];
-                    const filteredUnpaid = unpaidInvoices.filter(item => (customer === "all" || item.customer === customer) && (branch === "all" || String(item.branch) === String(branch)) && isCustomerInCategory(item.customer, category));
-                    const top10Unpaid = [...filteredUnpaid].sort((a, b) => (b.amountDue || 0) - (a.amountDue || 0)).slice(0, 10);
+                    const filteredUnpaid = unpaidInvoices.filter(item =>
+                      (customer === "all" || item.customer === customer) &&
+                      (branch === "all" || String(item.branch) === String(branch)) &&
+                      isCustomerInCategory(item.customer, category)
+                    );
+                    const sortedUnpaid = sortData(filteredUnpaid, unpaidSortCol, unpaidSortDir);
+                    const top10Unpaid = sortedUnpaid.slice(0, 10);
 
                     if (top10Unpaid.length === 0) {
                       return (
@@ -987,14 +1105,25 @@ export default function Page() {
             {/* Table Footer with Modal */}
             {!loading && (() => {
               const unpaidInvoices = data?.["summary-unpaid"] || [];
-              const filteredUnpaid = unpaidInvoices.filter(item => (customer === "all" || item.customer === customer) && (branch === "all" || String(item.branch) === String(branch)) && isCustomerInCategory(item.customer, category));
-              const totalUnpaidAmountDue = filteredUnpaid.reduce((sum, item) => sum + (item.amountDue || 0), 0);
+              const filteredUnpaidBase = unpaidInvoices.filter(item =>
+                (customer === "all" || item.customer === customer) &&
+                (branch === "all" || String(item.branch) === String(branch)) &&
+                isCustomerInCategory(item.customer, category)
+              );
+              const totalUnpaidAmountDue = filteredUnpaidBase.reduce((sum, item) => sum + (item.amountDue || 0), 0);
+
+              const filteredUnpaidModal = filteredUnpaidBase.filter(item =>
+                !unpaidSearch ||
+                item.customer.toLowerCase().includes(unpaidSearch.toLowerCase()) ||
+                (item.number && item.number.toLowerCase().includes(unpaidSearch.toLowerCase()))
+              );
+              const sortedUnpaidModal = sortData(filteredUnpaidModal, unpaidSortCol, unpaidSortDir);
 
               const itemsPerPageModal = 10;
-              const totalUnpaidPagesModal = Math.ceil(filteredUnpaid.length / itemsPerPageModal) || 1;
-              const paginatedUnpaidModal = filteredUnpaid.slice((unpaidModalPage - 1) * itemsPerPageModal, unpaidModalPage * itemsPerPageModal);
+              const totalUnpaidPagesModal = Math.ceil(sortedUnpaidModal.length / itemsPerPageModal) || 1;
+              const paginatedUnpaidModal = sortedUnpaidModal.slice((unpaidModalPage - 1) * itemsPerPageModal, unpaidModalPage * itemsPerPageModal);
 
-              if (filteredUnpaid.length === 0) return null;
+              if (filteredUnpaidBase.length === 0) return null;
 
               return (
                 <div className="border-t border-gray-100 dark:border-slate-850 px-4 py-3 flex items-center justify-between text-xs bg-slate-50/50 dark:bg-slate-900/30 mt-auto">
@@ -1008,28 +1137,38 @@ export default function Page() {
                       </span>
                     </DialogTrigger>
                     <DialogContent className="sm:max-w-[90vw] lg:max-w-6xl w-full max-h-[88vh] flex flex-col bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-2xl p-0 overflow-hidden z-[70]">
-                      <DialogHeader className="px-6 py-4 border-b border-gray-100 dark:border-slate-800 flex-shrink-0">
+                      <DialogHeader className="px-6 py-4 border-b border-gray-100 dark:border-slate-800 flex-shrink-0 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                         <DialogTitle className="text-lg font-bold text-slate-800 dark:text-white flex items-center gap-2">
                           <Receipt className="w-5 h-5 text-theme-orange" />
                           Detail Unpaid Invoices <span className="text-sm font-normal italic text-slate-500 tracking-normal">in home currency</span>
                         </DialogTitle>
+                        <div className="relative w-full sm:w-56">
+                          <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                          <input
+                            type="text"
+                            placeholder="Cari unpaid invoice..."
+                            value={unpaidSearch}
+                            onChange={(e) => setUnpaidSearch(e.target.value)}
+                            className="w-full text-xs pl-8 pr-3 py-1.5 rounded-lg border border-gray-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-200 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-theme-orange"
+                          />
+                        </div>
                       </DialogHeader>
                       <div className="overflow-auto flex-1 p-6">
                         <table className="w-full text-left border-collapse whitespace-nowrap text-xs">
                           <thead>
                             <tr className="bg-[#1A3644] text-white text-[10px] uppercase font-bold tracking-wider h-10 sticky top-0 z-10">
-                              <th className="px-4 py-2.5 font-bold">Customer</th>
-                              <th className="px-4 py-2.5 font-bold">Number</th>
-                              <th className="px-4 py-2.5 font-bold">Date</th>
-                              <th className="px-4 py-2.5 font-bold">Due Date</th>
-                              <th className="px-4 py-2.5 text-right font-bold">Amount Due</th>
+                              {renderSortableHeader("Customer", "customer", unpaidSortCol, unpaidSortDir, (c) => handleToggleSort(c, unpaidSortCol, unpaidSortDir, setUnpaidSortCol, setUnpaidSortDir), "left")}
+                              {renderSortableHeader("Number", "number", unpaidSortCol, unpaidSortDir, (c) => handleToggleSort(c, unpaidSortCol, unpaidSortDir, setUnpaidSortCol, setUnpaidSortDir), "left")}
+                              {renderSortableHeader("Date", "date", unpaidSortCol, unpaidSortDir, (c) => handleToggleSort(c, unpaidSortCol, unpaidSortDir, setUnpaidSortCol, setUnpaidSortDir), "left")}
+                              {renderSortableHeader("Due Date", "dueDate", unpaidSortCol, unpaidSortDir, (c) => handleToggleSort(c, unpaidSortCol, unpaidSortDir, setUnpaidSortCol, setUnpaidSortDir), "left")}
+                              {renderSortableHeader("Amount Due", "amountDue", unpaidSortCol, unpaidSortDir, (c) => handleToggleSort(c, unpaidSortCol, unpaidSortDir, setUnpaidSortCol, setUnpaidSortDir), "right")}
                             </tr>
                           </thead>
                           <tbody className="divide-y divide-gray-100 dark:divide-slate-800/50">
                             {paginatedUnpaidModal.map((item, idx) => (
                               <tr key={idx} className="hover:bg-slate-50 dark:hover:bg-slate-800/20 even:bg-slate-50/30 dark:even:bg-slate-800/5 h-11">
                                 <td className="px-4 py-3 font-semibold text-slate-700 dark:text-slate-300">{item.customer}</td>
-                                <td className="px-4 py-3 font-medium text-slate-600 dark:text-slate-400">{item.number}</td>
+                                <td className="px-4 py-3 font-medium text-slate-650 dark:text-slate-400">{item.number}</td>
                                 <td className="px-4 py-3 text-slate-600 dark:text-slate-450">{formatDate(item.date)}</td>
                                 <td className="px-4 py-3 text-slate-600 dark:text-slate-450">{formatDate(item.dueDate)}</td>
                                 <td className="px-4 py-3 text-right font-bold text-slate-800 dark:text-slate-100">{formatAmount(item.amountDue)}</td>
@@ -1044,7 +1183,7 @@ export default function Page() {
                         </div>
                         <div className="flex items-center gap-3">
                           <span className="text-slate-500">
-                            {(unpaidModalPage - 1) * itemsPerPageModal + 1}-{Math.min(unpaidModalPage * itemsPerPageModal, filteredUnpaid.length)} / {filteredUnpaid.length}
+                            {(unpaidModalPage - 1) * itemsPerPageModal + 1}-{Math.min(unpaidModalPage * itemsPerPageModal, sortedUnpaidModal.length)} / {sortedUnpaidModal.length}
                           </span>
                           <div className="flex items-center gap-1">
                             <button
@@ -1079,19 +1218,31 @@ export default function Page() {
           <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
             {/* Table: Paid Invoices by Customer */}
             <Card className="bg-white/95 dark:bg-slate-900/95 rounded-2xl border border-gray-200/80 dark:border-slate-800/40 shadow-sm overflow-hidden flex flex-col h-[500px]">
-              <CardHeader className="px-5 py-4 flex flex-row items-center gap-2.5 flex-shrink-0">
-                <FileText className="w-5 h-5 text-theme-orange" />
-                <CardTitle className="text-lg font-bold text-slate-800 dark:text-white flex items-center flex-wrap gap-x-1">Paid invoices by customer <span className="text-sm font-normal italic text-slate-500 tracking-normal">in home currency</span></CardTitle>
+              <CardHeader className="px-5 py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 flex-shrink-0">
+                <div className="flex items-center gap-2.5">
+                  <FileText className="w-5 h-5 text-theme-orange" />
+                  <CardTitle className="text-lg font-bold text-slate-800 dark:text-white flex items-center flex-wrap gap-x-1">Paid invoices by customer <span className="text-sm font-normal italic text-slate-500 tracking-normal">in home currency</span></CardTitle>
+                </div>
+                <div className="relative w-full sm:w-44">
+                  <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                  <input
+                    type="text"
+                    placeholder="Cari..."
+                    value={paidSearch}
+                    onChange={(e) => setPaidSearch(e.target.value)}
+                    className="w-full text-xs pl-8 pr-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-900/80 text-slate-800 dark:text-slate-200 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-theme-orange transition-all"
+                  />
+                </div>
               </CardHeader>
               <Separator />
               <div className="overflow-auto flex-1 text-slate-800 dark:text-slate-100" style={{ scrollbarGutter: "stable" }}>
                 <table className="w-full text-left border-collapse whitespace-nowrap">
                   <thead>
                     <tr className="bg-theme-brown text-white text-[10px] uppercase font-bold tracking-wider h-10 sticky top-0 z-10">
-                      <th className="px-4 py-2.5 font-bold">Customer</th>
-                      <th className="px-4 py-2.5 text-right font-bold">Current Month</th>
-                      <th className="px-4 py-2.5 text-right font-bold">Last Month</th>
-                      <th className="px-4 py-2.5 text-right font-bold">Last 12 Month</th>
+                      {renderSortableHeader("Customer", "customer", paidSortCol, paidSortDir, (c) => handleToggleSort(c, paidSortCol, paidSortDir, setPaidSortCol, setPaidSortDir), "left")}
+                      {renderSortableHeader("Current Month", "currentMonth", paidSortCol, paidSortDir, (c) => handleToggleSort(c, paidSortCol, paidSortDir, setPaidSortCol, setPaidSortDir), "right")}
+                      {renderSortableHeader("Last Month", "lastMonth", paidSortCol, paidSortDir, (c) => handleToggleSort(c, paidSortCol, paidSortDir, setPaidSortCol, setPaidSortDir), "right")}
+                      {renderSortableHeader("Last 12 Month", "last12Month", paidSortCol, paidSortDir, (c) => handleToggleSort(c, paidSortCol, paidSortDir, setPaidSortCol, setPaidSortDir), "right")}
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-100 dark:divide-slate-800/50 text-xs">
@@ -1106,7 +1257,12 @@ export default function Page() {
                       ))
                     ) : (() => {
                       const paidInvoices = data?.["paid-invoices-summary"] || [];
-                      const filteredPaid = paidInvoices.filter(item => (customer === "all" || item.customer === customer) && (branch === "all" || String(item.branch) === String(branch)) && isCustomerInCategory(item.customer, category));
+                      const filteredPaid = paidInvoices.filter(item =>
+                        (customer === "all" || item.customer === customer) &&
+                        (branch === "all" || String(item.branch) === String(branch)) &&
+                        isCustomerInCategory(item.customer, category) &&
+                        (!paidSearch || item.customer.toLowerCase().includes(paidSearch.toLowerCase()))
+                      );
                       const groupedPaidMap = new Map();
                       filteredPaid.forEach((item: any) => {
                         if (!groupedPaidMap.has(item.customer)) {
@@ -1118,12 +1274,13 @@ export default function Page() {
                         curr.last12Month += (item.last12Month || 0);
                       });
                       const groupedPaid = Array.from(groupedPaidMap.values());
+                      const sortedPaid = sortData(groupedPaid, paidSortCol as any, paidSortDir);
 
                       const itemsPerPage = 8;
-                      const totalPaidPages = Math.ceil(groupedPaid.length / itemsPerPage) || 1;
-                      const paginatedPaid = groupedPaid.slice((paidPage - 1) * itemsPerPage, paidPage * itemsPerPage);
+                      const totalPaidPages = Math.ceil(sortedPaid.length / itemsPerPage) || 1;
+                      const paginatedPaid = sortedPaid.slice((paidPage - 1) * itemsPerPage, paidPage * itemsPerPage);
 
-                      if (groupedPaid.length === 0) {
+                      if (sortedPaid.length === 0) {
                         return (
                           <tr>
                             <td colSpan={4} className="px-4 py-12 text-center text-slate-400 dark:text-slate-500 font-medium h-[352px]">
@@ -1133,13 +1290,13 @@ export default function Page() {
                         );
                       }
 
-                      const maxCurrentMonth = Math.max(...groupedPaid.map(item => item.currentMonth), 1);
-                      const maxLastMonth = Math.max(...groupedPaid.map(item => item.lastMonth), 1);
-                      const maxLast12Month = Math.max(...groupedPaid.map(item => item.last12Month), 1);
+                      const maxCurrentMonth = Math.max(...groupedPaid.map((item: any) => item.currentMonth), 1);
+                      const maxLastMonth = Math.max(...groupedPaid.map((item: any) => item.lastMonth), 1);
+                      const maxLast12Month = Math.max(...groupedPaid.map((item: any) => item.last12Month), 1);
 
                       return (
                         <>
-                          {paginatedPaid.map((item, idx) => {
+                          {paginatedPaid.map((item: any, idx: number) => {
                             const isCurrentSelected = customer === item.customer;
 
                             const currentBg = item.currentMonth > 0
@@ -1194,7 +1351,12 @@ export default function Page() {
               {/* Table Footer */}
               {!loading && (() => {
                 const paidInvoices = data?.["paid-invoices-summary"] || [];
-                const filteredPaid = paidInvoices.filter(item => (customer === "all" || item.customer === customer) && (branch === "all" || String(item.branch) === String(branch)) && isCustomerInCategory(item.customer, category));
+                const filteredPaid = paidInvoices.filter(item =>
+                  (customer === "all" || item.customer === customer) &&
+                  (branch === "all" || String(item.branch) === String(branch)) &&
+                  isCustomerInCategory(item.customer, category) &&
+                  (!paidSearch || item.customer.toLowerCase().includes(paidSearch.toLowerCase()))
+                );
                 const groupedPaidMap = new Map();
                 filteredPaid.forEach((item: any) => {
                   if (!groupedPaidMap.has(item.customer)) {
@@ -1206,21 +1368,22 @@ export default function Page() {
                   curr.last12Month += (item.last12Month || 0);
                 });
                 const groupedPaid = Array.from(groupedPaidMap.values());
+                const sortedPaid = sortData(groupedPaid, paidSortCol as any, paidSortDir);
 
                 const itemsPerPage = 8;
-                const totalPaidPages = Math.ceil(groupedPaid.length / itemsPerPage) || 1;
-                const totalPaidLast12Month = groupedPaid.reduce((sum, item) => sum + (item.last12Month || 0), 0);
+                const totalPaidPages = Math.ceil(sortedPaid.length / itemsPerPage) || 1;
+                const totalPaidAmount = groupedPaid.reduce((sum, item) => sum + (item.last12Month || 0), 0);
 
-                if (groupedPaid.length === 0) return null;
+                if (sortedPaid.length === 0) return null;
 
                 return (
                   <div className="border-t border-gray-100 dark:border-slate-850 px-4 py-3 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs bg-slate-50/50 dark:bg-slate-900/30 mt-auto">
                     <div className="font-bold text-slate-700 dark:text-slate-300">
-                      Grand Total: <span className="text-theme-orange ml-1">{formatPaidAmount(totalPaidLast12Month)}</span>
+                      Grand Total: <span className="text-theme-orange ml-1">{formatPaidAmount(totalPaidAmount)}</span>
                     </div>
                     <div className="flex items-center gap-3">
                       <span className="text-slate-500">
-                        {(paidPage - 1) * itemsPerPage + 1}-{Math.min(paidPage * itemsPerPage, groupedPaid.length)} / {groupedPaid.length}
+                        {(paidPage - 1) * itemsPerPage + 1}-{Math.min(paidPage * itemsPerPage, sortedPaid.length)} / {sortedPaid.length}
                       </span>
                       <div className="flex items-center gap-1">
                         <button
@@ -1555,25 +1718,37 @@ export default function Page() {
 
           {/* Customer Invoices Table */}
           <Card className="bg-white/95 dark:bg-slate-900/95 rounded-2xl border border-gray-200/80 dark:border-slate-800/40 shadow-sm overflow-hidden flex flex-col h-[500px] mt-8 mb-4">
-            <CardHeader className="px-5 py-4 flex flex-row items-center gap-2.5 flex-shrink-0">
-              <FileSpreadsheet className="w-5 h-5 text-theme-orange" />
-              <CardTitle className="text-lg font-bold text-slate-800 dark:text-white flex items-center flex-wrap gap-x-1">
-                Customer Invoices <span className="text-sm font-normal italic text-slate-500 tracking-normal">in home currency</span>
-              </CardTitle>
+            <CardHeader className="px-5 py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 flex-shrink-0">
+              <div className="flex items-center gap-2.5">
+                <FileSpreadsheet className="w-5 h-5 text-theme-orange" />
+                <CardTitle className="text-lg font-bold text-slate-800 dark:text-white flex items-center flex-wrap gap-x-1">
+                  Customer Invoices <span className="text-sm font-normal italic text-slate-500 tracking-normal">in home currency</span>
+                </CardTitle>
+              </div>
+              <div className="relative w-full sm:w-56">
+                <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                <input
+                  type="text"
+                  placeholder="Cari invoice / customer..."
+                  value={custInvoicesSearch}
+                  onChange={(e) => setCustInvoicesSearch(e.target.value)}
+                  className="w-full text-xs pl-8 pr-3 py-1.5 rounded-lg border border-gray-200 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-900/80 text-slate-800 dark:text-slate-200 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-theme-orange transition-all"
+                />
+              </div>
             </CardHeader>
             <Separator />
             <div className="overflow-auto flex-1 text-slate-800 dark:text-slate-100" style={{ scrollbarGutter: "stable" }}>
               <table className="w-full text-left border-collapse whitespace-nowrap">
                 <thead>
                   <tr className="bg-[#1A3644] text-white text-[10px] uppercase font-bold tracking-wider h-10 sticky top-0 z-10">
-                    <th className="px-4 py-2.5 font-bold">CUSTOMER</th>
-                    <th className="px-4 py-2.5 font-bold">INVOICE NO.</th>
-                    <th className="px-4 py-2.5 font-bold">DATE</th>
-                    <th className="px-4 py-2.5 font-bold">DUE DATE</th>
-                    <th className="px-4 py-2.5 font-bold">CURRENCY</th>
-                    <th className="px-4 py-2.5 text-right font-bold">AMOUNT IN CURRENCY</th>
-                    <th className="px-4 py-2.5 text-right font-bold">AMOUNT IN HOME CURRENCY</th>
-                    <th className="px-4 py-2.5 text-right font-bold">AMOUNT DUE IN HOME CURRENCY</th>
+                    {renderSortableHeader("CUSTOMER", "customer", custInvoicesSortCol, custInvoicesSortDir, (c) => handleToggleSort(c, custInvoicesSortCol, custInvoicesSortDir, setCustInvoicesSortCol, setCustInvoicesSortDir), "left")}
+                    {renderSortableHeader("INVOICE NO.", "invoiceNo", custInvoicesSortCol, custInvoicesSortDir, (c) => handleToggleSort(c, custInvoicesSortCol, custInvoicesSortDir, setCustInvoicesSortCol, setCustInvoicesSortDir), "left")}
+                    {renderSortableHeader("DATE", "date", custInvoicesSortCol, custInvoicesSortDir, (c) => handleToggleSort(c, custInvoicesSortCol, custInvoicesSortDir, setCustInvoicesSortCol, setCustInvoicesSortDir), "left")}
+                    {renderSortableHeader("DUE DATE", "dueDate", custInvoicesSortCol, custInvoicesSortDir, (c) => handleToggleSort(c, custInvoicesSortCol, custInvoicesSortDir, setCustInvoicesSortCol, setCustInvoicesSortDir), "left")}
+                    {renderSortableHeader("CURRENCY", "currency", custInvoicesSortCol, custInvoicesSortDir, (c) => handleToggleSort(c, custInvoicesSortCol, custInvoicesSortDir, setCustInvoicesSortCol, setCustInvoicesSortDir), "left")}
+                    {renderSortableHeader("AMOUNT IN CURRENCY", "amountInCurrency", custInvoicesSortCol, custInvoicesSortDir, (c) => handleToggleSort(c, custInvoicesSortCol, custInvoicesSortDir, setCustInvoicesSortCol, setCustInvoicesSortDir), "right")}
+                    {renderSortableHeader("AMOUNT IN HOME CURRENCY", "amountInHomeCurrency", custInvoicesSortCol, custInvoicesSortDir, (c) => handleToggleSort(c, custInvoicesSortCol, custInvoicesSortDir, setCustInvoicesSortCol, setCustInvoicesSortDir), "right")}
+                    {renderSortableHeader("AMOUNT DUE IN HOME CURRENCY", "amountDueInHomeCurrency", custInvoicesSortCol, custInvoicesSortDir, (c) => handleToggleSort(c, custInvoicesSortCol, custInvoicesSortDir, setCustInvoicesSortCol, setCustInvoicesSortDir), "right")}
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100 dark:divide-slate-800/50 text-xs">
@@ -1592,12 +1767,19 @@ export default function Page() {
                     ))
                   ) : (() => {
                     const allInvoices = data?.["customer-invoices"] || [];
-                    const filteredInvoices = allInvoices.filter(item => (customer === "all" || item.customer === customer) && isCustomerInCategory(item.customer, category));
+                    const filteredInvoices = allInvoices.filter(item =>
+                      (customer === "all" || item.customer === customer) &&
+                      isCustomerInCategory(item.customer, category) &&
+                      (!custInvoicesSearch ||
+                        item.customer.toLowerCase().includes(custInvoicesSearch.toLowerCase()) ||
+                        (item.invoiceNo && item.invoiceNo.toLowerCase().includes(custInvoicesSearch.toLowerCase())))
+                    );
+                    const sortedInvoices = sortData(filteredInvoices, custInvoicesSortCol, custInvoicesSortDir);
 
                     const itemsPerPage = 8;
-                    const paginatedInvoices = filteredInvoices.slice((customerInvoicesPage - 1) * itemsPerPage, customerInvoicesPage * itemsPerPage);
+                    const paginatedInvoices = sortedInvoices.slice((customerInvoicesPage - 1) * itemsPerPage, customerInvoicesPage * itemsPerPage);
 
-                    if (filteredInvoices.length === 0) {
+                    if (sortedInvoices.length === 0) {
                       return (
                         <tr>
                           <td colSpan={8} className="px-4 py-12 text-center text-slate-400 dark:text-slate-500 font-medium h-[352px]">
@@ -1634,12 +1816,19 @@ export default function Page() {
             {/* Table Footer */}
             {!loading && (() => {
               const allInvoices = data?.["customer-invoices"] || [];
-              const filteredInvoices = allInvoices.filter(item => (customer === "all" || item.customer === customer) && isCustomerInCategory(item.customer, category));
+              const filteredInvoices = allInvoices.filter(item =>
+                (customer === "all" || item.customer === customer) &&
+                isCustomerInCategory(item.customer, category) &&
+                (!custInvoicesSearch ||
+                  item.customer.toLowerCase().includes(custInvoicesSearch.toLowerCase()) ||
+                  (item.invoiceNo && item.invoiceNo.toLowerCase().includes(custInvoicesSearch.toLowerCase())))
+              );
+              const sortedInvoices = sortData(filteredInvoices, custInvoicesSortCol, custInvoicesSortDir);
               const itemsPerPage = 8;
-              const totalPages = Math.ceil(filteredInvoices.length / itemsPerPage) || 1;
-              const totalAmtHome = filteredInvoices.reduce((sum, item) => sum + (item.amountInHomeCurrency || 0), 0);
+              const totalPages = Math.ceil(sortedInvoices.length / itemsPerPage) || 1;
+              const totalAmtHome = sortedInvoices.reduce((sum, item) => sum + (item.amountInHomeCurrency || 0), 0);
 
-              if (filteredInvoices.length === 0) return null;
+              if (sortedInvoices.length === 0) return null;
 
               return (
                 <div className="border-t border-gray-100 dark:border-slate-850 px-4 py-3 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs bg-slate-50/50 dark:bg-slate-900/30 mt-auto">
@@ -1648,7 +1837,7 @@ export default function Page() {
                   </div>
                   <div className="flex items-center gap-3">
                     <span className="text-slate-500">
-                      {(customerInvoicesPage - 1) * itemsPerPage + 1}-{Math.min(customerInvoicesPage * itemsPerPage, filteredInvoices.length)} / {filteredInvoices.length}
+                      {(customerInvoicesPage - 1) * itemsPerPage + 1}-{Math.min(customerInvoicesPage * itemsPerPage, sortedInvoices.length)} / {sortedInvoices.length}
                     </span>
                     <div className="flex items-center gap-1">
                       <button
@@ -1674,12 +1863,22 @@ export default function Page() {
 
           {/* UMC This Year Table */}
           <Card className="bg-white/95 dark:bg-slate-900/95 rounded-2xl border overflow-hidden flex flex-col h-[500px] mt-8 mb-4 transition-all duration-300 border-gray-200/80 dark:border-slate-800/40 shadow-sm">
-            <CardHeader className="px-5 py-4 flex flex-row items-center justify-between gap-2.5 flex-shrink-0">
+            <CardHeader className="px-5 py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 flex-shrink-0">
               <div className="flex items-center gap-2.5">
                 <Receipt className="w-5 h-5 text-theme-orange" />
                 <CardTitle className="text-lg font-bold text-slate-800 dark:text-white flex items-center flex-wrap gap-x-1">
                   UMC This Year <span className="text-sm font-normal italic text-slate-500 tracking-normal">in home currency</span>
                 </CardTitle>
+              </div>
+              <div className="relative w-full sm:w-56">
+                <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                <input
+                  type="text"
+                  placeholder="Cari ref nbr / customer..."
+                  value={umcSearch}
+                  onChange={(e) => setUmcSearch(e.target.value)}
+                  className="w-full text-xs pl-8 pr-3 py-1.5 rounded-lg border border-gray-200 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-900/80 text-slate-800 dark:text-slate-200 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-theme-orange transition-all"
+                />
               </div>
             </CardHeader>
             <Separator />
@@ -1687,12 +1886,12 @@ export default function Page() {
               <table className="w-full text-left border-collapse whitespace-nowrap">
                 <thead>
                   <tr className="bg-[#1A3644] text-white text-[10px] uppercase font-bold tracking-wider h-10 sticky top-0 z-10">
-                    <th className="px-4 py-2.5 font-bold">CUSTOMER</th>
-                    <th className="px-4 py-2.5 font-bold">REF NBR</th>
-                    <th className="px-4 py-2.5 font-bold">DUE DATE</th>
-                    <th className="px-4 py-2.5 font-bold">CURRENCY</th>
-                    <th className="px-4 py-2.5 text-right font-bold">AMOUNT IN CURRENCY</th>
-                    <th className="px-4 py-2.5 text-right font-bold">AMOUNT IN HOME CURRENCY</th>
+                    {renderSortableHeader("CUSTOMER", "customer", umcSortCol, umcSortDir, (c) => handleToggleSort(c, umcSortCol, umcSortDir, setUmcSortCol, setUmcSortDir), "left")}
+                    {renderSortableHeader("REF NBR", "invoiceNo", umcSortCol, umcSortDir, (c) => handleToggleSort(c, umcSortCol, umcSortDir, setUmcSortCol, setUmcSortDir), "left")}
+                    {renderSortableHeader("DUE DATE", "dueDate", umcSortCol, umcSortDir, (c) => handleToggleSort(c, umcSortCol, umcSortDir, setUmcSortCol, setUmcSortDir), "left")}
+                    {renderSortableHeader("CURRENCY", "currency", umcSortCol, umcSortDir, (c) => handleToggleSort(c, umcSortCol, umcSortDir, setUmcSortCol, setUmcSortDir), "left")}
+                    {renderSortableHeader("AMOUNT IN CURRENCY", "amountInCurrency", umcSortCol, umcSortDir, (c) => handleToggleSort(c, umcSortCol, umcSortDir, setUmcSortCol, setUmcSortDir), "right")}
+                    {renderSortableHeader("AMOUNT IN HOME CURRENCY", "amountInHomeCurrency", umcSortCol, umcSortDir, (c) => handleToggleSort(c, umcSortCol, umcSortDir, setUmcSortCol, setUmcSortDir), "right")}
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100 dark:divide-slate-800/50 text-xs">
@@ -1709,12 +1908,19 @@ export default function Page() {
                     ))
                   ) : (() => {
                     const allUmc = data?.["all-umc-this-year"] || [];
-                    const filteredUmc = allUmc.filter(item => (customer === "all" || item.customer === customer) && isCustomerInCategory(item.customer, category));
+                    const filteredUmc = allUmc.filter(item =>
+                      (customer === "all" || item.customer === customer) &&
+                      isCustomerInCategory(item.customer, category) &&
+                      (!umcSearch ||
+                        item.customer.toLowerCase().includes(umcSearch.toLowerCase()) ||
+                        (item.invoiceNo && item.invoiceNo.toLowerCase().includes(umcSearch.toLowerCase())))
+                    );
+                    const sortedUmc = sortData(filteredUmc, umcSortCol, umcSortDir);
 
                     const itemsPerPage = 8;
-                    const paginatedUmc = filteredUmc.slice((umcPage - 1) * itemsPerPage, umcPage * itemsPerPage);
+                    const paginatedUmc = sortedUmc.slice((umcPage - 1) * itemsPerPage, umcPage * itemsPerPage);
 
-                    if (filteredUmc.length === 0) {
+                    if (sortedUmc.length === 0) {
                       return (
                         <tr>
                           <td colSpan={6} className="px-4 py-12 text-center text-slate-400 dark:text-slate-500 font-medium h-[352px]">
@@ -1749,12 +1955,19 @@ export default function Page() {
             {/* Table Footer */}
             {!loading && (() => {
               const allUmc = data?.["all-umc-this-year"] || [];
-              const filteredUmc = allUmc.filter(item => (customer === "all" || item.customer === customer) && isCustomerInCategory(item.customer, category));
+              const filteredUmc = allUmc.filter(item =>
+                (customer === "all" || item.customer === customer) &&
+                isCustomerInCategory(item.customer, category) &&
+                (!umcSearch ||
+                  item.customer.toLowerCase().includes(umcSearch.toLowerCase()) ||
+                  (item.invoiceNo && item.invoiceNo.toLowerCase().includes(umcSearch.toLowerCase())))
+              );
+              const sortedUmc = sortData(filteredUmc, umcSortCol, umcSortDir);
               const itemsPerPage = 8;
-              const totalPages = Math.ceil(filteredUmc.length / itemsPerPage) || 1;
-              const totalAmountHome = filteredUmc.reduce((sum, item) => sum + (item.amountInHomeCurrency || 0), 0);
+              const totalPages = Math.ceil(sortedUmc.length / itemsPerPage) || 1;
+              const totalAmountHome = sortedUmc.reduce((sum, item) => sum + (item.amountInHomeCurrency || 0), 0);
 
-              if (filteredUmc.length === 0) return null;
+              if (sortedUmc.length === 0) return null;
 
               return (
                 <div className="border-t border-gray-100 dark:border-slate-850 px-4 py-3 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs bg-slate-50/50 dark:bg-slate-900/30 mt-auto">
@@ -1763,7 +1976,7 @@ export default function Page() {
                   </div>
                   <div className="flex items-center gap-3">
                     <span className="text-slate-500">
-                      {(umcPage - 1) * itemsPerPage + 1}-{Math.min(umcPage * itemsPerPage, filteredUmc.length)} / {filteredUmc.length}
+                      {(umcPage - 1) * itemsPerPage + 1}-{Math.min(umcPage * itemsPerPage, sortedUmc.length)} / {sortedUmc.length}
                     </span>
                     <div className="flex items-center gap-1">
                       <button
