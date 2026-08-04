@@ -62,6 +62,15 @@ interface CustomerInvoice {
   amountDueInHomeCurrency: number;
 }
 
+interface UmcItem {
+  customer: string;
+  invoiceNo: string;
+  dueDate: string;
+  currency: string;
+  amountInCurrency: number;
+  amountInHomeCurrency: number;
+}
+
 interface ArSummaryResponse {
   summary: {
     branch: string;
@@ -77,6 +86,7 @@ interface ArSummaryResponse {
   "paid-invoices-summary": PaidInvoiceSummary[];
   "paid-vs-unpaid-monthly": PaidVsUnpaidMonthly[];
   "customer-invoices": CustomerInvoice[];
+  "all-umc-this-year": UmcItem[];
 }
 
 export default function Page() {
@@ -87,6 +97,7 @@ export default function Page() {
   const [unpaidPage, setUnpaidPage] = useState<number>(1);
   const [paidPage, setPaidPage] = useState<number>(1);
   const [customerInvoicesPage, setCustomerInvoicesPage] = useState<number>(1);
+  const [umcPage, setUmcPage] = useState<number>(1);
   const [summaryModalPage, setSummaryModalPage] = useState<number>(1);
   const [unpaidModalPage, setUnpaidModalPage] = useState<number>(1);
   const [mounted, setMounted] = useState<boolean>(false);
@@ -206,6 +217,7 @@ export default function Page() {
     setUnpaidPage(1);
     setPaidPage(1);
     setCustomerInvoicesPage(1);
+    setUmcPage(1);
     setSummaryModalPage(1);
     setUnpaidModalPage(1);
   }, [customer, category]);
@@ -1649,6 +1661,121 @@ export default function Page() {
                       <button
                         onClick={() => setCustomerInvoicesPage(p => Math.min(totalPages, p + 1))}
                         disabled={customerInvoicesPage === totalPages}
+                        className="p-1 rounded border border-gray-255 dark:border-slate-700 hover:bg-white dark:hover:bg-slate-800 disabled:opacity-40 transition-colors cursor-pointer"
+                      >
+                        &gt;
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
+          </Card>
+
+          {/* UMC This Year Table */}
+          <Card className="bg-white/95 dark:bg-slate-900/95 rounded-2xl border overflow-hidden flex flex-col h-[500px] mt-8 mb-4 transition-all duration-300 border-gray-200/80 dark:border-slate-800/40 shadow-sm">
+            <CardHeader className="px-5 py-4 flex flex-row items-center justify-between gap-2.5 flex-shrink-0">
+              <div className="flex items-center gap-2.5">
+                <Receipt className="w-5 h-5 text-theme-orange" />
+                <CardTitle className="text-lg font-bold text-slate-800 dark:text-white flex items-center flex-wrap gap-x-1">
+                  UMC This Year <span className="text-sm font-normal italic text-slate-500 tracking-normal">in home currency</span>
+                </CardTitle>
+              </div>
+            </CardHeader>
+            <Separator />
+            <div className="overflow-auto flex-1 text-slate-800 dark:text-slate-100" style={{ scrollbarGutter: "stable" }}>
+              <table className="w-full text-left border-collapse whitespace-nowrap">
+                <thead>
+                  <tr className="bg-[#1A3644] text-white text-[10px] uppercase font-bold tracking-wider h-10 sticky top-0 z-10">
+                    <th className="px-4 py-2.5 font-bold">CUSTOMER</th>
+                    <th className="px-4 py-2.5 font-bold">REF NBR</th>
+                    <th className="px-4 py-2.5 font-bold">DUE DATE</th>
+                    <th className="px-4 py-2.5 font-bold">CURRENCY</th>
+                    <th className="px-4 py-2.5 text-right font-bold">AMOUNT IN CURRENCY</th>
+                    <th className="px-4 py-2.5 text-right font-bold">AMOUNT IN HOME CURRENCY</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100 dark:divide-slate-800/50 text-xs">
+                  {loading ? (
+                    Array.from({ length: 8 }).map((_, i) => (
+                      <tr key={i} className="animate-pulse h-11">
+                        <td className="px-4 py-3"><div className="h-3 w-24 bg-slate-200 dark:bg-slate-800 rounded"></div></td>
+                        <td className="px-4 py-3"><div className="h-3 w-16 bg-slate-200 dark:bg-slate-800 rounded"></div></td>
+                        <td className="px-4 py-3"><div className="h-3 w-14 bg-slate-200 dark:bg-slate-800 rounded"></div></td>
+                        <td className="px-4 py-3"><div className="h-3 w-10 bg-slate-200 dark:bg-slate-800 rounded"></div></td>
+                        <td className="px-4 py-3"><div className="h-3 w-16 bg-slate-200 dark:bg-slate-800 rounded ml-auto"></div></td>
+                        <td className="px-4 py-3"><div className="h-3 w-16 bg-slate-200 dark:bg-slate-800 rounded ml-auto"></div></td>
+                      </tr>
+                    ))
+                  ) : (() => {
+                    const allUmc = data?.["all-umc-this-year"] || [];
+                    const filteredUmc = allUmc.filter(item => (customer === "all" || item.customer === customer) && isCustomerInCategory(item.customer, category));
+
+                    const itemsPerPage = 8;
+                    const paginatedUmc = filteredUmc.slice((umcPage - 1) * itemsPerPage, umcPage * itemsPerPage);
+
+                    if (filteredUmc.length === 0) {
+                      return (
+                        <tr>
+                          <td colSpan={6} className="px-4 py-12 text-center text-slate-400 dark:text-slate-500 font-medium h-[352px]">
+                            No data found
+                          </td>
+                        </tr>
+                      );
+                    }
+
+                    return (
+                      <>
+                        {paginatedUmc.map((item, idx) => (
+                          <tr
+                            key={idx}
+                            className="hover:bg-slate-50 dark:hover:bg-slate-800/20 transition-colors even:bg-slate-50/30 dark:even:bg-slate-800/5 h-11"
+                          >
+                            <td className="px-4 py-3 font-semibold text-slate-700 dark:text-slate-300 truncate max-w-[200px]" title={item.customer}>{item.customer}</td>
+                            <td className="px-4 py-3 font-medium text-slate-650 dark:text-slate-350">{item.invoiceNo}</td>
+                            <td className="px-4 py-3 font-medium text-slate-650 dark:text-slate-350">{formatDate(item.dueDate)}</td>
+                            <td className="px-4 py-3 font-medium text-slate-650 dark:text-slate-350">{item.currency || "-"}</td>
+                            <td className="px-4 py-3 text-right font-medium text-slate-650 dark:text-slate-350">{formatAmount(item.amountInCurrency)}</td>
+                            <td className="px-4 py-3 text-right font-bold text-slate-800 dark:text-slate-100">{formatAmount(item.amountInHomeCurrency)}</td>
+                          </tr>
+                        ))}
+                      </>
+                    );
+                  })()}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Table Footer */}
+            {!loading && (() => {
+              const allUmc = data?.["all-umc-this-year"] || [];
+              const filteredUmc = allUmc.filter(item => (customer === "all" || item.customer === customer) && isCustomerInCategory(item.customer, category));
+              const itemsPerPage = 8;
+              const totalPages = Math.ceil(filteredUmc.length / itemsPerPage) || 1;
+              const totalAmountHome = filteredUmc.reduce((sum, item) => sum + (item.amountInHomeCurrency || 0), 0);
+
+              if (filteredUmc.length === 0) return null;
+
+              return (
+                <div className="border-t border-gray-100 dark:border-slate-850 px-4 py-3 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs bg-slate-50/50 dark:bg-slate-900/30 mt-auto">
+                  <div className="font-bold text-slate-700 dark:text-slate-300">
+                    Grand Total: <span className="text-theme-orange ml-1">{formatAmount(totalAmountHome)}</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className="text-slate-500">
+                      {(umcPage - 1) * itemsPerPage + 1}-{Math.min(umcPage * itemsPerPage, filteredUmc.length)} / {filteredUmc.length}
+                    </span>
+                    <div className="flex items-center gap-1">
+                      <button
+                        onClick={() => setUmcPage(p => Math.max(1, p - 1))}
+                        disabled={umcPage === 1}
+                        className="p-1 rounded border border-gray-255 dark:border-slate-700 hover:bg-white dark:hover:bg-slate-800 disabled:opacity-40 transition-colors cursor-pointer"
+                      >
+                        &lt;
+                      </button>
+                      <button
+                        onClick={() => setUmcPage(p => Math.min(totalPages, p + 1))}
+                        disabled={umcPage === totalPages}
                         className="p-1 rounded border border-gray-255 dark:border-slate-700 hover:bg-white dark:hover:bg-slate-800 disabled:opacity-40 transition-colors cursor-pointer"
                       >
                         &gt;
