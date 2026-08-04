@@ -87,6 +87,8 @@ export default function Page() {
   const [unpaidPage, setUnpaidPage] = useState<number>(1);
   const [paidPage, setPaidPage] = useState<number>(1);
   const [customerInvoicesPage, setCustomerInvoicesPage] = useState<number>(1);
+  const [summaryModalPage, setSummaryModalPage] = useState<number>(1);
+  const [unpaidModalPage, setUnpaidModalPage] = useState<number>(1);
   const [mounted, setMounted] = useState<boolean>(false);
 
   useEffect(() => {
@@ -204,6 +206,8 @@ export default function Page() {
     setUnpaidPage(1);
     setPaidPage(1);
     setCustomerInvoicesPage(1);
+    setSummaryModalPage(1);
+    setUnpaidModalPage(1);
   }, [customer, category]);
 
   // Formatter displaying the original raw value in Indonesian locale format
@@ -727,11 +731,13 @@ export default function Page() {
 
         {/* AR Aging Section */}
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-          {/* Table 1: Summary */}
+          {/* Table 1: Summary (Top 10) */}
           <Card className="bg-white/95 dark:bg-slate-900/95 rounded-2xl border border-gray-200/80 dark:border-slate-800/40 shadow-sm overflow-hidden flex flex-col h-[500px]">
-            <CardHeader className="px-5 py-4 flex flex-row items-center gap-2.5 flex-shrink-0">
-              <FileSpreadsheet className="w-5 h-5 text-theme-orange" />
-              <CardTitle className="text-lg font-bold text-slate-800 dark:text-white flex items-center flex-wrap gap-x-1">Summary Customers <span className="text-sm font-normal italic text-slate-500 tracking-normal">in home currency</span></CardTitle>
+            <CardHeader className="px-5 py-4 flex flex-row items-center justify-between gap-2.5 flex-shrink-0">
+              <div className="flex items-center gap-2.5">
+                <FileSpreadsheet className="w-5 h-5 text-theme-orange" />
+                <CardTitle className="text-lg font-bold text-slate-800 dark:text-white flex items-center flex-wrap gap-x-1">Summary Customers (Top 10) <span className="text-sm font-normal italic text-slate-500 tracking-normal">in home currency</span></CardTitle>
+              </div>
             </CardHeader>
             <Separator />
             <div className="overflow-auto flex-1">
@@ -765,12 +771,9 @@ export default function Page() {
                   ) : (() => {
                     const summaryCustomers = data?.["summary-customer"] || [];
                     const filteredSummary = summaryCustomers.filter(item => (customer === "all" || item.customer === customer) && (branch === "all" || String(item.branch) === String(branch)) && isCustomerInCategory(item.customer, category));
-                    const itemsPerPage = 8;
-                    const totalSummaryPages = Math.ceil(filteredSummary.length / itemsPerPage) || 1;
-                    const paginatedSummary = filteredSummary.slice((summaryPage - 1) * itemsPerPage, summaryPage * itemsPerPage);
-                    const totalSummaryAmountDue = filteredSummary.reduce((sum, item) => sum + (item.amountDue || 0), 0);
+                    const top10Summary = [...filteredSummary].sort((a, b) => (b.amountDue || 0) - (a.amountDue || 0)).slice(0, 10);
 
-                    if (filteredSummary.length === 0) {
+                    if (top10Summary.length === 0) {
                       return (
                         <tr>
                           <td colSpan={8} className="px-4 py-12 text-center text-slate-400 dark:text-slate-500 font-medium h-[352px]">
@@ -782,7 +785,7 @@ export default function Page() {
 
                     return (
                       <>
-                        {paginatedSummary.map((item, idx) => (
+                        {top10Summary.map((item, idx) => (
                           <tr
                             key={idx}
                             onClick={() => setCustomer(customer === item.customer ? "all" : item.customer)}
@@ -805,52 +808,109 @@ export default function Page() {
               </table>
             </div>
 
-            {/* Table Footer */}
+            {/* Table Footer with Modal */}
             {!loading && (() => {
               const summaryCustomers = data?.["summary-customer"] || [];
               const filteredSummary = summaryCustomers.filter(item => (customer === "all" || item.customer === customer) && (branch === "all" || String(item.branch) === String(branch)) && isCustomerInCategory(item.customer, category));
-              const itemsPerPage = 8;
-              const totalSummaryPages = Math.ceil(filteredSummary.length / itemsPerPage) || 1;
               const totalSummaryAmountDue = filteredSummary.reduce((sum, item) => sum + (item.amountDue || 0), 0);
+
+              const itemsPerPageModal = 10;
+              const totalSummaryPagesModal = Math.ceil(filteredSummary.length / itemsPerPageModal) || 1;
+              const paginatedSummaryModal = filteredSummary.slice((summaryModalPage - 1) * itemsPerPageModal, summaryModalPage * itemsPerPageModal);
 
               if (filteredSummary.length === 0) return null;
 
               return (
-                <div className="border-t border-gray-100 dark:border-slate-850 px-4 py-3 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs bg-slate-50/50 dark:bg-slate-900/30 mt-auto">
-                  <div className="font-bold text-slate-700 dark:text-slate-300">
-                    Grand Total: <span className="text-theme-orange ml-1">{formatAmount(totalSummaryAmountDue)}</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <span className="text-slate-500">
-                      {(summaryPage - 1) * itemsPerPage + 1}-{Math.min(summaryPage * itemsPerPage, filteredSummary.length)} / {filteredSummary.length}
-                    </span>
-                    <div className="flex items-center gap-1">
-                      <button
-                        onClick={() => setSummaryPage(p => Math.max(1, p - 1))}
-                        disabled={summaryPage === 1}
-                        className="p-1 rounded border border-gray-255 dark:border-slate-700 hover:bg-white dark:hover:bg-slate-800 disabled:opacity-40 transition-colors cursor-pointer"
-                      >
-                        &lt;
-                      </button>
-                      <button
-                        onClick={() => setSummaryPage(p => Math.min(totalSummaryPages, p + 1))}
-                        disabled={summaryPage === totalSummaryPages}
-                        className="p-1 rounded border border-gray-255 dark:border-slate-700 hover:bg-white dark:hover:bg-slate-800 disabled:opacity-40 transition-colors cursor-pointer"
-                      >
-                        &gt;
-                      </button>
-                    </div>
-                  </div>
+                <div className="border-t border-gray-100 dark:border-slate-850 px-4 py-3 flex items-center justify-between text-xs bg-slate-50/50 dark:bg-slate-900/30 mt-auto">
+                  <Dialog>
+                    <DialogTrigger className="cursor-pointer group flex items-center gap-2 hover:text-theme-orange transition-colors">
+                      <div className="font-bold text-slate-700 dark:text-slate-300">
+                        Grand Total: <span className="text-theme-orange ml-1 underline decoration-dotted">{formatAmount(totalSummaryAmountDue)}</span>
+                      </div>
+                      <span className="text-[10px] font-semibold text-theme-orange bg-theme-orange/10 border border-theme-orange/30 rounded px-2 py-0.5 group-hover:bg-theme-orange group-hover:text-white transition-colors">
+                        Lihat Detail
+                      </span>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-[90vw] lg:max-w-6xl w-full max-h-[88vh] flex flex-col bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-2xl p-0 overflow-hidden z-[70]">
+                      <DialogHeader className="px-6 py-4 border-b border-gray-100 dark:border-slate-800 flex-shrink-0">
+                        <DialogTitle className="text-lg font-bold text-slate-800 dark:text-white flex items-center gap-2">
+                          <FileSpreadsheet className="w-5 h-5 text-theme-orange" />
+                          Detail Summary Customers <span className="text-sm font-normal italic text-slate-500 tracking-normal">in home currency</span>
+                        </DialogTitle>
+                      </DialogHeader>
+                      <div className="overflow-auto flex-1 p-6">
+                        <table className="w-full text-left border-collapse whitespace-nowrap text-xs">
+                          <thead>
+                            <tr className="bg-theme-brown text-white text-[10px] uppercase font-bold tracking-wider h-10 sticky top-0 z-10">
+                              <th className="px-4 py-2.5 font-bold">Customer</th>
+                              <th className="px-4 py-2.5 text-right font-bold">Current</th>
+                              <th className="px-4 py-2.5 text-right font-bold">1-30</th>
+                              <th className="px-4 py-2.5 text-right font-bold">31-60</th>
+                              <th className="px-4 py-2.5 text-right font-bold">61-90</th>
+                              <th className="px-4 py-2.5 text-right font-bold">91-180</th>
+                              <th className="px-4 py-2.5 text-right font-bold">Over 180</th>
+                              <th className="px-4 py-2.5 text-right font-bold">Amount Due</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-gray-100 dark:divide-slate-800/50">
+                            {paginatedSummaryModal.map((item, idx) => (
+                              <tr key={idx} className="hover:bg-slate-50 dark:hover:bg-slate-800/20 even:bg-slate-50/30 dark:even:bg-slate-800/5 h-11">
+                                <td className="px-4 py-3 font-semibold text-slate-700 dark:text-slate-300">{item.customer}</td>
+                                <td className="px-4 py-3 text-right font-medium">{item.current ? formatAmount(item.current) : "0"}</td>
+                                <td className="px-4 py-3 text-right font-medium">{item["1-30"] ? formatAmount(item["1-30"]) : "0"}</td>
+                                <td className="px-4 py-3 text-right font-medium">{item["31-60"] ? formatAmount(item["31-60"]) : "0"}</td>
+                                <td className="px-4 py-3 text-right font-medium">{item["61-90"] ? formatAmount(item["61-90"]) : "0"}</td>
+                                <td className="px-4 py-3 text-right font-medium">{item["91-180"] ? formatAmount(item["91-180"]) : "0"}</td>
+                                <td className="px-4 py-3 text-right font-medium">{item["over180"] ? formatAmount(item["over180"]) : "0"}</td>
+                                <td className="px-4 py-3 text-right font-bold text-slate-800 dark:text-slate-100">{formatAmount(item.amountDue)}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                      <div className="border-t border-gray-100 dark:border-slate-800 px-6 py-3 flex items-center justify-between text-xs bg-slate-50/50 dark:bg-slate-900/30 flex-shrink-0">
+                        <div className="font-bold text-slate-700 dark:text-slate-300">
+                          Grand Total: <span className="text-theme-orange ml-1">{formatAmount(totalSummaryAmountDue)}</span>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <span className="text-slate-500">
+                            {(summaryModalPage - 1) * itemsPerPageModal + 1}-{Math.min(summaryModalPage * itemsPerPageModal, filteredSummary.length)} / {filteredSummary.length}
+                          </span>
+                          <div className="flex items-center gap-1">
+                            <button
+                              onClick={() => setSummaryModalPage(p => Math.max(1, p - 1))}
+                              disabled={summaryModalPage === 1}
+                              className="p-1 rounded border border-gray-255 dark:border-slate-700 hover:bg-white dark:hover:bg-slate-800 disabled:opacity-40 transition-colors cursor-pointer"
+                            >
+                              &lt;
+                            </button>
+                            <button
+                              onClick={() => setSummaryModalPage(p => Math.min(totalSummaryPagesModal, p + 1))}
+                              disabled={summaryModalPage === totalSummaryPagesModal}
+                              className="p-1 rounded border border-gray-255 dark:border-slate-700 hover:bg-white dark:hover:bg-slate-800 disabled:opacity-40 transition-colors cursor-pointer"
+                            >
+                              &gt;
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
+                  <span className="text-slate-400 text-[11px] font-medium">Top 10 Displayed</span>
                 </div>
               );
             })()}
           </Card>
 
-          {/* Table 2: Unpaid Invoices */}
+          {/* Table 2: Unpaid Invoices (Top 10) */}
           <Card className="bg-white/95 dark:bg-slate-900/95 rounded-2xl border border-gray-200/80 dark:border-slate-800/40 shadow-sm overflow-hidden flex flex-col h-[500px]">
-            <CardHeader className="px-5 py-4 flex flex-row items-center gap-2.5 flex-shrink-0">
-              <Receipt className="w-5 h-5 text-theme-orange" />
-              <CardTitle className="text-lg font-bold text-slate-800 dark:text-white flex items-center flex-wrap gap-x-1">Unpaid Invoices <span className="text-sm font-normal italic text-slate-500 tracking-normal">in home currency</span></CardTitle>
+            <CardHeader className="px-5 py-4 flex flex-row items-center justify-between gap-2.5 flex-shrink-0">
+              <div className="flex items-center gap-2.5">
+                <Receipt className="w-5 h-5 text-theme-orange" />
+                <CardTitle className="text-lg font-bold text-slate-800 dark:text-white flex items-center flex-wrap gap-x-1">
+                  Unpaid Invoices (Top 10) <span className="text-sm font-normal italic text-slate-500 tracking-normal">in home currency</span>
+                </CardTitle>
+              </div>
             </CardHeader>
             <Separator />
             <div className="overflow-auto flex-1">
@@ -878,11 +938,9 @@ export default function Page() {
                   ) : (() => {
                     const unpaidInvoices = data?.["summary-unpaid"] || [];
                     const filteredUnpaid = unpaidInvoices.filter(item => (customer === "all" || item.customer === customer) && (branch === "all" || String(item.branch) === String(branch)) && isCustomerInCategory(item.customer, category));
-                    const itemsPerPage = 8;
-                    const totalUnpaidPages = Math.ceil(filteredUnpaid.length / itemsPerPage) || 1;
-                    const paginatedUnpaid = filteredUnpaid.slice((unpaidPage - 1) * itemsPerPage, unpaidPage * itemsPerPage);
+                    const top10Unpaid = [...filteredUnpaid].sort((a, b) => (b.amountDue || 0) - (a.amountDue || 0)).slice(0, 10);
 
-                    if (filteredUnpaid.length === 0) {
+                    if (top10Unpaid.length === 0) {
                       return (
                         <tr>
                           <td colSpan={5} className="px-4 py-12 text-center text-slate-400 dark:text-slate-500 font-medium h-[352px]">
@@ -894,7 +952,7 @@ export default function Page() {
 
                     return (
                       <>
-                        {paginatedUnpaid.map((item, idx) => (
+                        {top10Unpaid.map((item, idx) => (
                           <tr
                             key={idx}
                             onClick={() => setCustomer(customer === item.customer ? "all" : item.customer)}
@@ -914,42 +972,89 @@ export default function Page() {
               </table>
             </div>
 
-            {/* Table Footer */}
+            {/* Table Footer with Modal */}
             {!loading && (() => {
               const unpaidInvoices = data?.["summary-unpaid"] || [];
               const filteredUnpaid = unpaidInvoices.filter(item => (customer === "all" || item.customer === customer) && (branch === "all" || String(item.branch) === String(branch)) && isCustomerInCategory(item.customer, category));
-              const itemsPerPage = 8;
-              const totalUnpaidPages = Math.ceil(filteredUnpaid.length / itemsPerPage) || 1;
               const totalUnpaidAmountDue = filteredUnpaid.reduce((sum, item) => sum + (item.amountDue || 0), 0);
+
+              const itemsPerPageModal = 10;
+              const totalUnpaidPagesModal = Math.ceil(filteredUnpaid.length / itemsPerPageModal) || 1;
+              const paginatedUnpaidModal = filteredUnpaid.slice((unpaidModalPage - 1) * itemsPerPageModal, unpaidModalPage * itemsPerPageModal);
 
               if (filteredUnpaid.length === 0) return null;
 
               return (
-                <div className="border-t border-gray-100 dark:border-slate-850 px-4 py-3 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs bg-slate-50/50 dark:bg-slate-900/30 mt-auto">
-                  <div className="font-bold text-slate-700 dark:text-slate-300">
-                    Grand Total: <span className="text-theme-orange ml-1">{formatAmount(totalUnpaidAmountDue)}</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <span className="text-slate-500">
-                      {(unpaidPage - 1) * itemsPerPage + 1}-{Math.min(unpaidPage * itemsPerPage, filteredUnpaid.length)} / {filteredUnpaid.length}
-                    </span>
-                    <div className="flex items-center gap-1">
-                      <button
-                        onClick={() => setUnpaidPage(p => Math.max(1, p - 1))}
-                        disabled={unpaidPage === 1}
-                        className="p-1 rounded border border-gray-255 dark:border-slate-700 hover:bg-white dark:hover:bg-slate-800 disabled:opacity-40 transition-colors cursor-pointer"
-                      >
-                        &lt;
-                      </button>
-                      <button
-                        onClick={() => setUnpaidPage(p => Math.min(totalUnpaidPages, p + 1))}
-                        disabled={unpaidPage === totalUnpaidPages}
-                        className="p-1 rounded border border-gray-255 dark:border-slate-700 hover:bg-white dark:hover:bg-slate-800 disabled:opacity-40 transition-colors cursor-pointer"
-                      >
-                        &gt;
-                      </button>
-                    </div>
-                  </div>
+                <div className="border-t border-gray-100 dark:border-slate-850 px-4 py-3 flex items-center justify-between text-xs bg-slate-50/50 dark:bg-slate-900/30 mt-auto">
+                  <Dialog>
+                    <DialogTrigger className="cursor-pointer group flex items-center gap-2 hover:text-theme-orange transition-colors">
+                      <div className="font-bold text-slate-700 dark:text-slate-300">
+                        Grand Total: <span className="text-theme-orange ml-1 underline decoration-dotted">{formatAmount(totalUnpaidAmountDue)}</span>
+                      </div>
+                      <span className="text-[10px] font-semibold text-theme-orange bg-theme-orange/10 border border-theme-orange/30 rounded px-2 py-0.5 group-hover:bg-theme-orange group-hover:text-white transition-colors">
+                        Lihat Detail
+                      </span>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-[90vw] lg:max-w-6xl w-full max-h-[88vh] flex flex-col bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-2xl p-0 overflow-hidden z-[70]">
+                      <DialogHeader className="px-6 py-4 border-b border-gray-100 dark:border-slate-800 flex-shrink-0">
+                        <DialogTitle className="text-lg font-bold text-slate-800 dark:text-white flex items-center gap-2">
+                          <Receipt className="w-5 h-5 text-theme-orange" />
+                          Detail Unpaid Invoices <span className="text-sm font-normal italic text-slate-500 tracking-normal">in home currency</span>
+                        </DialogTitle>
+                      </DialogHeader>
+                      <div className="overflow-auto flex-1 p-6">
+                        <table className="w-full text-left border-collapse whitespace-nowrap text-xs">
+                          <thead>
+                            <tr className="bg-[#1A3644] text-white text-[10px] uppercase font-bold tracking-wider h-10 sticky top-0 z-10">
+                              <th className="px-4 py-2.5 font-bold">Customer</th>
+                              <th className="px-4 py-2.5 font-bold">Number</th>
+                              <th className="px-4 py-2.5 font-bold">Date</th>
+                              <th className="px-4 py-2.5 font-bold">Due Date</th>
+                              <th className="px-4 py-2.5 text-right font-bold">Amount Due</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-gray-100 dark:divide-slate-800/50">
+                            {paginatedUnpaidModal.map((item, idx) => (
+                              <tr key={idx} className="hover:bg-slate-50 dark:hover:bg-slate-800/20 even:bg-slate-50/30 dark:even:bg-slate-800/5 h-11">
+                                <td className="px-4 py-3 font-semibold text-slate-700 dark:text-slate-300">{item.customer}</td>
+                                <td className="px-4 py-3 font-medium text-slate-600 dark:text-slate-400">{item.number}</td>
+                                <td className="px-4 py-3 text-slate-600 dark:text-slate-450">{formatDate(item.date)}</td>
+                                <td className="px-4 py-3 text-slate-600 dark:text-slate-450">{formatDate(item.dueDate)}</td>
+                                <td className="px-4 py-3 text-right font-bold text-slate-800 dark:text-slate-100">{formatAmount(item.amountDue)}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                      <div className="border-t border-gray-100 dark:border-slate-800 px-6 py-3 flex items-center justify-between text-xs bg-slate-50/50 dark:bg-slate-900/30 flex-shrink-0">
+                        <div className="font-bold text-slate-700 dark:text-slate-300">
+                          Grand Total: <span className="text-theme-orange ml-1">{formatAmount(totalUnpaidAmountDue)}</span>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <span className="text-slate-500">
+                            {(unpaidModalPage - 1) * itemsPerPageModal + 1}-{Math.min(unpaidModalPage * itemsPerPageModal, filteredUnpaid.length)} / {filteredUnpaid.length}
+                          </span>
+                          <div className="flex items-center gap-1">
+                            <button
+                              onClick={() => setUnpaidModalPage(p => Math.max(1, p - 1))}
+                              disabled={unpaidModalPage === 1}
+                              className="p-1 rounded border border-gray-255 dark:border-slate-700 hover:bg-white dark:hover:bg-slate-800 disabled:opacity-40 transition-colors cursor-pointer"
+                            >
+                              &lt;
+                            </button>
+                            <button
+                              onClick={() => setUnpaidModalPage(p => Math.min(totalUnpaidPagesModal, p + 1))}
+                              disabled={unpaidModalPage === totalUnpaidPagesModal}
+                              className="p-1 rounded border border-gray-255 dark:border-slate-700 hover:bg-white dark:hover:bg-slate-800 disabled:opacity-40 transition-colors cursor-pointer"
+                            >
+                              &gt;
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
+                  <span className="text-slate-400 text-[11px] font-medium">Top 10 Displayed</span>
                 </div>
               );
             })()}
