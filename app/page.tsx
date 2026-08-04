@@ -87,6 +87,11 @@ export default function Page() {
   const [unpaidPage, setUnpaidPage] = useState<number>(1);
   const [paidPage, setPaidPage] = useState<number>(1);
   const [customerInvoicesPage, setCustomerInvoicesPage] = useState<number>(1);
+  const [mounted, setMounted] = useState<boolean>(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const getDefaultStartDate = () => {
     return `2024-01-01`;
@@ -116,12 +121,9 @@ export default function Page() {
   const formatDisplayDate = (dateStr: string) => {
     if (!dateStr) return "Pilih tanggal";
     const [year, month, day] = dateStr.split("-").map(Number);
-    const date = new Date(year, month - 1, day);
-    return date.toLocaleDateString("id-ID", {
-      day: "numeric",
-      month: "short",
-      year: "numeric",
-    });
+    if (!year || !month || !day) return dateStr;
+    const months = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"];
+    return `${day} ${months[month - 1] || ""} ${year}`;
   };
 
   // Date filters defaulted to Jan 1st of current year and today
@@ -397,11 +399,12 @@ export default function Page() {
             </Dialog>
             <button
               onClick={fetchData}
-              disabled={loading}
+              disabled={mounted ? loading : false}
+              suppressHydrationWarning
               className="p-2.5 bg-[#f0f2f5] dark:bg-slate-800 hover:bg-gray-200 dark:hover:bg-slate-700 rounded-xl border border-gray-300/80 dark:border-slate-700 hover:border-theme-orange/20 hover:text-theme-orange transition-colors cursor-pointer h-9 w-9 flex items-center justify-center text-gray-600 dark:text-gray-300"
               title="Refresh Data"
             >
-              <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin" : ""}`} />
+              <RefreshCw className={`w-3.5 h-3.5 ${mounted && loading ? "animate-spin" : ""}`} />
             </button>
           </div>
         </div>
