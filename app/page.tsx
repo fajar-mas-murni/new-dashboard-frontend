@@ -1395,7 +1395,11 @@ export default function Page() {
                 </div>
               ) : (() => {
                 const rawMonthlyData = data?.["paid-vs-unpaid-monthly"] || [];
-                const branchFilteredMonthly = rawMonthlyData.filter((item: any) => branch === "all" || String(item.branch) === String(branch));
+                const branchFilteredMonthly = rawMonthlyData.filter((item: any) =>
+                  (branch === "all" || String(item.branch) === String(branch)) &&
+                  (customer === "all" || item.customer === customer) &&
+                  isCustomerInCategory(item.customer, category)
+                );
                 const monthlyMap = new Map();
                 branchFilteredMonthly.forEach((item: any) => {
                   const period = item.period;
