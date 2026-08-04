@@ -815,7 +815,7 @@ export default function Page() {
               return (
                 <div className="border-t border-gray-100 dark:border-slate-850 px-4 py-3 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs bg-slate-50/50 dark:bg-slate-900/30 mt-auto">
                   <div className="font-bold text-slate-700 dark:text-slate-300">
-                    Total keseluruhan: <span className="text-theme-orange ml-1">{formatAmount(totalSummaryAmountDue)}</span>
+                    Grand Total: <span className="text-theme-orange ml-1">{formatAmount(totalSummaryAmountDue)}</span>
                   </div>
                   <div className="flex items-center gap-3">
                     <span className="text-slate-500">
@@ -924,7 +924,7 @@ export default function Page() {
               return (
                 <div className="border-t border-gray-100 dark:border-slate-850 px-4 py-3 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs bg-slate-50/50 dark:bg-slate-900/30 mt-auto">
                   <div className="font-bold text-slate-700 dark:text-slate-300">
-                    Total keseluruhan: <span className="text-theme-orange ml-1">{formatAmount(totalUnpaidAmountDue)}</span>
+                    Grand Total: <span className="text-theme-orange ml-1">{formatAmount(totalUnpaidAmountDue)}</span>
                   </div>
                   <div className="flex items-center gap-3">
                     <span className="text-slate-500">
@@ -1096,7 +1096,7 @@ export default function Page() {
                 return (
                   <div className="border-t border-gray-100 dark:border-slate-850 px-4 py-3 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs bg-slate-50/50 dark:bg-slate-900/30 mt-auto">
                     <div className="font-bold text-slate-700 dark:text-slate-300">
-                      Total keseluruhan: <span className="text-theme-orange ml-1">{formatPaidAmount(totalPaidLast12Month)}</span>
+                      Grand Total: <span className="text-theme-orange ml-1">{formatPaidAmount(totalPaidLast12Month)}</span>
                     </div>
                     <div className="flex items-center gap-3">
                       <span className="text-slate-500">
@@ -1520,7 +1520,7 @@ export default function Page() {
               return (
                 <div className="border-t border-gray-100 dark:border-slate-850 px-4 py-3 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs bg-slate-50/50 dark:bg-slate-900/30 mt-auto">
                   <div className="font-bold text-slate-700 dark:text-slate-300">
-                    Total keseluruhan: <span className="text-theme-orange ml-1">{formatAmount(totalAmtHome)}</span>
+                    Grand Total: <span className="text-theme-orange ml-1">{formatAmount(totalAmtHome)}</span>
                   </div>
                   <div className="flex items-center gap-3">
                     <span className="text-slate-500">
