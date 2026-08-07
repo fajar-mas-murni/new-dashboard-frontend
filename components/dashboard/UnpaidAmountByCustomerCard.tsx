@@ -31,7 +31,7 @@ export function UnpaidAmountByCustomerCard({
           <div className="h-6 w-64 bg-slate-200 dark:bg-slate-800 rounded-md"></div>
         </CardHeader>
         <Separator className="opacity-50" />
-        <CardContent className="p-0 pt-6">
+        <CardContent>
           <div className="flex flex-col lg:flex-row gap-8 items-stretch">
             <div className="flex-1 space-y-4 pr-0 lg:pr-8 pb-6 lg:pb-0">
               {Array.from({ length: 10 }).map((_, i) => (
@@ -90,8 +90,8 @@ export function UnpaidAmountByCustomerCard({
   if (filteredTop10.length === 0) return null;
 
   return (
-    <Card className="bg-white/95 dark:bg-slate-900/95 rounded-2xl border border-gray-200/80 dark:border-slate-800/40 shadow-sm overflow-hidden p-6 sm:p-8 relative transition-colors duration-300 mt-8 mb-4">
-      <CardHeader className="p-0 mb-5 flex flex-row items-center gap-2.5">
+    <Card className="bg-white/95 dark:bg-slate-900/95 rounded-2xl border border-gray-200/80 dark:border-slate-800/40 shadow-sm overflow-hidden relative transition-colors duration-300">
+      <CardHeader className="p-6 flex flex-row items-center gap-2.5">
         <CardTitle className="text-xl font-bold flex items-center gap-2.5">
           <BarChart3 className="w-5.5 h-5.5 text-theme-orange" />
           <span className="flex items-center flex-wrap gap-x-1">
@@ -103,7 +103,7 @@ export function UnpaidAmountByCustomerCard({
         </CardTitle>
       </CardHeader>
       <Separator />
-      <CardContent className="p-0 pt-6">
+      <CardContent>
         <div className="flex flex-col lg:flex-row gap-8 items-stretch p-2 sm:p-6">
           {/* Left Column: Horizontal Bar Chart */}
           <div className="flex-1 flex flex-col justify-between pr-0 lg:pr-8 pb-6 lg:pb-0">
@@ -117,9 +117,8 @@ export function UnpaidAmountByCustomerCard({
                   <div
                     key={idx}
                     onClick={() => setCustomer(customer === item.customer ? "all" : item.customer)}
-                    className={`flex items-center gap-3 cursor-pointer group transition-all duration-300 ${
-                      isMuted ? "opacity-30 scale-[0.98]" : "opacity-100"
-                    }`}
+                    className={`flex items-center gap-3 cursor-pointer group transition-all duration-300 ${isMuted ? "opacity-30 scale-[0.98]" : "opacity-100"
+                      }`}
                   >
                     <div
                       className="w-28 text-right text-xs font-semibold text-slate-600 dark:text-slate-300 truncate group-hover:text-theme-orange transition-colors"
@@ -180,9 +179,8 @@ export function UnpaidAmountByCustomerCard({
                             strokeDashoffset={strokeOffset}
                             transform={`rotate(${angle} 100 100)`}
                             strokeLinecap="round"
-                            className={`transition-all duration-300 cursor-pointer ${
-                              isMuted ? "opacity-30" : "opacity-100"
-                            }`}
+                            className={`transition-all duration-300 cursor-pointer ${isMuted ? "opacity-30" : "opacity-100"
+                              }`}
                             onClick={() => setCustomer(customer === item.customer ? "all" : item.customer)}
                           />
                         );
@@ -210,9 +208,8 @@ export function UnpaidAmountByCustomerCard({
                         <div
                           key={idx}
                           onClick={() => setCustomer(customer === item.customer ? "all" : item.customer)}
-                          className={`flex items-center gap-2.5 text-xs font-semibold transition-all cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/30 p-1.5 rounded-md ${
-                            isMuted ? "opacity-35" : "opacity-100"
-                          } ${isSelected ? "bg-slate-100/80 dark:bg-slate-800/50" : ""}`}
+                          className={`flex items-center gap-2.5 text-xs font-semibold transition-all cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/30 p-1.5 rounded-md ${isMuted ? "opacity-35" : "opacity-100"
+                            } ${isSelected ? "bg-slate-100/80 dark:bg-slate-800/50" : ""}`}
                         >
                           <span
                             style={{ backgroundColor: `var(--chart-${(idx % 10) + 1})` }}

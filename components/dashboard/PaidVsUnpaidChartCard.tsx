@@ -3,6 +3,7 @@
 import React from "react";
 import { BarChart3 } from "lucide-react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 import { ArSummaryResponse, FilterCategory } from "@/types/ar";
 import { formatPaidAmount, formatPeriod, isCustomerInCategory } from "@/lib/formatters";
 
@@ -22,14 +23,15 @@ export function PaidVsUnpaidChartCard({
   category,
 }: PaidVsUnpaidChartCardProps) {
   return (
-    <Card className="bg-white/95 dark:bg-slate-900/95 rounded-2xl border border-gray-200/80 dark:border-slate-800/40 shadow-sm overflow-hidden p-6 sm:p-8 relative transition-colors duration-300 mt-8 mb-4">
-      <CardHeader className="p-0 mb-5 flex flex-row items-center gap-2.5">
+    <Card className="bg-white/95 dark:bg-slate-900/95 rounded-2xl border border-gray-200/80 dark:border-slate-800/40 shadow-sm overflow-hidden relative transition-colors duration-300 mt-8 mb-4">
+      <CardHeader className="p-6 flex flex-row items-center gap-2.5">
         <BarChart3 className="w-6 h-6 text-theme-orange" />
         <h2 className="text-xl sm:text-2xl font-bold text-[#1a202c] dark:text-white">
           Paid vs unpaid invoices <span className="text-sm font-normal italic text-slate-500 ml-1 tracking-normal">in home currency</span>
         </h2>
       </CardHeader>
-      <CardContent className="p-0 pt-1">
+      <Separator />
+      <CardContent className="p-6">
         {loading ? (
           <div className="h-80 w-full bg-slate-50 dark:bg-slate-800/20 rounded-xl animate-pulse flex items-end justify-between p-6">
             {Array.from({ length: 12 }).map((_, i) => (
@@ -89,9 +91,8 @@ export function PaidVsUnpaidChartCard({
                   {yAxisTicks.map((_, i) => (
                     <div
                       key={i}
-                      className={`w-full ${
-                        i === 4 ? "border-t-2 border-gray-300 dark:border-gray-500" : "border-t border-gray-100 dark:border-slate-800"
-                      }`}
+                      className={`w-full ${i === 4 ? "border-t-2 border-gray-300 dark:border-gray-500" : "border-t border-gray-100 dark:border-slate-800"
+                        }`}
                     ></div>
                   ))}
                 </div>

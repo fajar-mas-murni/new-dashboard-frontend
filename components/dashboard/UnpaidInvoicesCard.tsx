@@ -138,9 +138,8 @@ export function UnpaidInvoicesCard({
                 <tr
                   key={idx}
                   onClick={() => setCustomer(customer === item.customer ? "all" : item.customer)}
-                  className={`hover:bg-slate-50 dark:hover:bg-slate-800/20 cursor-pointer transition-colors even:bg-slate-50/30 dark:even:bg-slate-800/5 h-11 ${
-                    customer === item.customer ? "bg-theme-orange/10 dark:bg-theme-orange/5" : ""
-                  }`}
+                  className={`hover:bg-slate-50 dark:hover:bg-slate-800/20 cursor-pointer transition-colors even:bg-slate-50/30 dark:even:bg-slate-800/5 h-11 ${customer === item.customer ? "bg-theme-orange/10 dark:bg-theme-orange/5" : ""
+                    }`}
                 >
                   <td className="px-4 py-3 font-semibold text-slate-700 dark:text-slate-300 truncate max-w-[150px]" title={item.customer}>
                     {item.customer}
@@ -171,7 +170,7 @@ export function UnpaidInvoicesCard({
               </span>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[90vw] lg:max-w-6xl w-full max-h-[88vh] flex flex-col bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-2xl p-0 overflow-hidden z-[70]">
-              <DialogHeader className="px-6 py-4 border-b border-gray-100 dark:border-slate-800 flex-shrink-0 flex flex-col sm:flex-row sm:items-center justify-between gap-3 pr-14 sm:pr-16">
+              <DialogHeader className="p-6 border-b border-gray-100 dark:border-slate-800 flex-shrink-0 flex flex-col sm:flex-row sm:items-center justify-between gap-3 pr-14 sm:pr-16">
                 <DialogTitle className="text-lg font-bold text-slate-800 dark:text-white flex items-center gap-2">
                   <Receipt className="w-5 h-5 text-theme-orange" />
                   Detail Unpaid Invoices <span className="text-sm font-normal italic text-slate-500 tracking-normal">in home currency</span>
@@ -187,7 +186,7 @@ export function UnpaidInvoicesCard({
                   />
                 </div>
               </DialogHeader>
-              <div className="overflow-auto flex-1 p-6">
+              <div className="overflow-auto flex-1">
                 <table className="w-full text-left border-collapse whitespace-nowrap text-xs">
                   <thead>
                     <tr className="bg-[#1A3644] text-white text-[10px] uppercase font-bold tracking-wider h-10 sticky top-0 z-10">

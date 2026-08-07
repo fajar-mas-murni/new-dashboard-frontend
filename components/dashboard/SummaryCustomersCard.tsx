@@ -162,9 +162,8 @@ export function SummaryCustomersCard({
                 <tr
                   key={idx}
                   onClick={() => setCustomer(customer === item.customer ? "all" : item.customer)}
-                  className={`hover:bg-slate-50 dark:hover:bg-slate-800/20 cursor-pointer transition-colors even:bg-slate-50/30 dark:even:bg-slate-800/5 h-11 ${
-                    customer === item.customer ? "bg-theme-orange/10 dark:bg-theme-orange/5" : ""
-                  }`}
+                  className={`hover:bg-slate-50 dark:hover:bg-slate-800/20 cursor-pointer transition-colors even:bg-slate-50/30 dark:even:bg-slate-800/5 h-11 ${customer === item.customer ? "bg-theme-orange/10 dark:bg-theme-orange/5" : ""
+                    }`}
                 >
                   <td className="px-4 py-3 font-semibold text-slate-700 dark:text-slate-300 truncate max-w-[120px]" title={item.customer}>
                     {item.customer}
@@ -226,7 +225,7 @@ export function SummaryCustomersCard({
                   />
                 </div>
               </DialogHeader>
-              <div className="overflow-auto flex-1 p-6">
+              <div className="overflow-auto flex-1">
                 <table className="w-full text-left border-collapse whitespace-nowrap text-xs">
                   <thead>
                     <tr className="bg-theme-brown text-white text-[10px] uppercase font-bold tracking-wider h-10 sticky top-0 z-10">
