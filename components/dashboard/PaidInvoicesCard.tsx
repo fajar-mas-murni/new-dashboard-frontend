@@ -1,12 +1,13 @@
 "use client";
 
 import React, { useState } from "react";
-import { FileText, Search } from "lucide-react";
+import { FileText, Search, Download } from "lucide-react";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { ArSummaryResponse, FilterCategory } from "@/types/ar";
 import { formatPaidAmount, isCustomerInCategory } from "@/lib/formatters";
 import { sortData, handleToggleSort, renderSortableHeader } from "@/lib/table-utils";
+import { exportToExcel } from "@/lib/excel-export";
 
 interface PaidInvoicesCardProps {
   data: ArSummaryResponse | null;
@@ -67,6 +68,13 @@ export function PaidInvoicesCard({
   const maxLastMonth = Math.max(...groupedPaid.map((item: any) => item.lastMonth), 1);
   const maxLast12Month = Math.max(...groupedPaid.map((item: any) => item.last12Month), 1);
 
+  const columnMapping = {
+    customer: "Customer",
+    currentMonth: "Current Month",
+    lastMonth: "Last Month",
+    last12Month: "Last 12 Month",
+  };
+
   return (
     <Card className="bg-white/95 dark:bg-slate-900/95 rounded-2xl border border-gray-200/80 dark:border-slate-800/40 shadow-sm overflow-hidden flex flex-col h-[500px]">
       <CardHeader className="px-5 py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 flex-shrink-0">
@@ -77,18 +85,29 @@ export function PaidInvoicesCard({
             <span className="text-sm font-normal italic text-slate-500 tracking-normal">in home currency</span>
           </CardTitle>
         </div>
-        <div className="relative w-full sm:w-44">
-          <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" />
-          <input
-            type="text"
-            placeholder="Cari..."
-            value={paidSearch}
-            onChange={(e) => {
-              setPaidSearch(e.target.value);
-              setPaidPage(1);
-            }}
-            className="w-full text-xs pl-8 pr-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-900/80 text-slate-800 dark:text-slate-200 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-theme-orange transition-all"
-          />
+        <div className="flex items-center gap-2.5 w-full sm:w-auto">
+          <button
+            onClick={() => exportToExcel(sortedPaid, "Paid_Invoices_By_Customer", columnMapping)}
+            disabled={loading || sortedPaid.length === 0}
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-lg text-xs transition-colors cursor-pointer disabled:opacity-40"
+            title="Export to Excel"
+          >
+            <Download className="w-3.5 h-3.5" />
+            <span>Excel</span>
+          </button>
+          <div className="relative w-full sm:w-44">
+            <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" />
+            <input
+              type="text"
+              placeholder="Cari..."
+              value={paidSearch}
+              onChange={(e) => {
+                setPaidSearch(e.target.value);
+                setPaidPage(1);
+              }}
+              className="w-full text-xs pl-8 pr-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-900/80 text-slate-800 dark:text-slate-200 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-theme-orange transition-all"
+            />
+          </div>
         </div>
       </CardHeader>
       <Separator />

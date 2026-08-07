@@ -1,13 +1,14 @@
 "use client";
 
 import React, { useState } from "react";
-import { FileSpreadsheet, Search } from "lucide-react";
+import { FileSpreadsheet, Search, Download } from "lucide-react";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
 import { ArSummaryResponse, CustomerSummary, FilterCategory } from "@/types/ar";
 import { formatAmount, isCustomerInCategory } from "@/lib/formatters";
 import { sortData, handleToggleSort, renderSortableHeader } from "@/lib/table-utils";
+import { exportToExcel } from "@/lib/excel-export";
 
 interface SummaryCustomersCardProps {
   data: ArSummaryResponse | null;
@@ -55,6 +56,18 @@ export function SummaryCustomersCard({
     summaryModalPage * itemsPerPageModal
   );
 
+  const columnMapping = {
+    customer: "Customer",
+    branch: "Branch",
+    current: "Current",
+    "1-30": "1-30",
+    "31-60": "31-60",
+    "61-90": "61-90",
+    "91-180": "91-180",
+    over180: "Over 180",
+    amountDue: "Amount Due",
+  };
+
   return (
     <Card className="bg-white/95 dark:bg-slate-900/95 rounded-2xl border border-gray-200/80 dark:border-slate-800/40 shadow-sm overflow-hidden flex flex-col h-[500px]">
       <CardHeader className="px-5 py-4 flex flex-row items-center justify-between gap-2.5 flex-shrink-0">
@@ -65,76 +78,29 @@ export function SummaryCustomersCard({
             <span className="text-sm font-normal italic text-slate-500 tracking-normal">in home currency</span>
           </CardTitle>
         </div>
+        <button
+          onClick={() => exportToExcel(sortedSummary, "Summary_Customers", columnMapping)}
+          disabled={loading || sortedSummary.length === 0}
+          className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-lg text-xs transition-colors cursor-pointer disabled:opacity-40"
+          title="Export to Excel"
+        >
+          <Download className="w-3.5 h-3.5" />
+          <span>Excel</span>
+        </button>
       </CardHeader>
       <Separator />
       <div className="overflow-auto flex-1">
         <table className="w-full text-left border-collapse whitespace-nowrap">
           <thead>
             <tr className="bg-theme-brown text-white text-[10px] uppercase font-bold tracking-wider h-10 sticky top-0 z-10">
-              {renderSortableHeader(
-                "Customer",
-                "customer",
-                summarySortCol,
-                summarySortDir,
-                (c) => handleToggleSort(c, summarySortCol, summarySortDir, setSummarySortCol, setSummarySortDir),
-                "left"
-              )}
-              {renderSortableHeader(
-                "Current",
-                "current",
-                summarySortCol,
-                summarySortDir,
-                (c) => handleToggleSort(c, summarySortCol, summarySortDir, setSummarySortCol, setSummarySortDir),
-                "right"
-              )}
-              {renderSortableHeader(
-                "1-30",
-                "1-30",
-                summarySortCol,
-                summarySortDir,
-                (c) => handleToggleSort(c, summarySortCol, summarySortDir, setSummarySortCol, setSummarySortDir),
-                "right"
-              )}
-              {renderSortableHeader(
-                "31-60",
-                "31-60",
-                summarySortCol,
-                summarySortDir,
-                (c) => handleToggleSort(c, summarySortCol, summarySortDir, setSummarySortCol, setSummarySortDir),
-                "right"
-              )}
-              {renderSortableHeader(
-                "61-90",
-                "61-90",
-                summarySortCol,
-                summarySortDir,
-                (c) => handleToggleSort(c, summarySortCol, summarySortDir, setSummarySortCol, setSummarySortDir),
-                "right"
-              )}
-              {renderSortableHeader(
-                "91-180",
-                "91-180",
-                summarySortCol,
-                summarySortDir,
-                (c) => handleToggleSort(c, summarySortCol, summarySortDir, setSummarySortCol, setSummarySortDir),
-                "right"
-              )}
-              {renderSortableHeader(
-                "Over 180",
-                "over180",
-                summarySortCol,
-                summarySortDir,
-                (c) => handleToggleSort(c, summarySortCol, summarySortDir, setSummarySortCol, setSummarySortDir),
-                "right"
-              )}
-              {renderSortableHeader(
-                "Amount Due",
-                "amountDue",
-                summarySortCol,
-                summarySortDir,
-                (c) => handleToggleSort(c, summarySortCol, summarySortDir, setSummarySortCol, setSummarySortDir),
-                "right"
-              )}
+              {renderSortableHeader("Customer", "customer", summarySortCol, summarySortDir, (c) => handleToggleSort(c, summarySortCol, summarySortDir, setSummarySortCol, setSummarySortDir), "left")}
+              {renderSortableHeader("Current", "current", summarySortCol, summarySortDir, (c) => handleToggleSort(c, summarySortCol, summarySortDir, setSummarySortCol, setSummarySortDir), "right")}
+              {renderSortableHeader("1-30", "1-30", summarySortCol, summarySortDir, (c) => handleToggleSort(c, summarySortCol, summarySortDir, setSummarySortCol, setSummarySortDir), "right")}
+              {renderSortableHeader("31-60", "31-60", summarySortCol, summarySortDir, (c) => handleToggleSort(c, summarySortCol, summarySortDir, setSummarySortCol, setSummarySortDir), "right")}
+              {renderSortableHeader("61-90", "61-90", summarySortCol, summarySortDir, (c) => handleToggleSort(c, summarySortCol, summarySortDir, setSummarySortCol, setSummarySortDir), "right")}
+              {renderSortableHeader("91-180", "91-180", summarySortCol, summarySortDir, (c) => handleToggleSort(c, summarySortCol, summarySortDir, setSummarySortCol, setSummarySortDir), "right")}
+              {renderSortableHeader("Over 180", "over180", summarySortCol, summarySortDir, (c) => handleToggleSort(c, summarySortCol, summarySortDir, setSummarySortCol, setSummarySortDir), "right")}
+              {renderSortableHeader("Amount Due", "amountDue", summarySortCol, summarySortDir, (c) => handleToggleSort(c, summarySortCol, summarySortDir, setSummarySortCol, setSummarySortDir), "right")}
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100 dark:divide-slate-800/50 text-xs">
@@ -162,8 +128,9 @@ export function SummaryCustomersCard({
                 <tr
                   key={idx}
                   onClick={() => setCustomer(customer === item.customer ? "all" : item.customer)}
-                  className={`hover:bg-slate-50 dark:hover:bg-slate-800/20 cursor-pointer transition-colors even:bg-slate-50/30 dark:even:bg-slate-800/5 h-11 ${customer === item.customer ? "bg-theme-orange/10 dark:bg-theme-orange/5" : ""
-                    }`}
+                  className={`hover:bg-slate-50 dark:hover:bg-slate-800/20 cursor-pointer transition-colors even:bg-slate-50/30 dark:even:bg-slate-800/5 h-11 ${
+                    customer === item.customer ? "bg-theme-orange/10 dark:bg-theme-orange/5" : ""
+                  }`}
                 >
                   <td className="px-4 py-3 font-semibold text-slate-700 dark:text-slate-300 truncate max-w-[120px]" title={item.customer}>
                     {item.customer}
@@ -214,18 +181,29 @@ export function SummaryCustomersCard({
                   <FileSpreadsheet className="w-5 h-5 text-theme-orange" />
                   Detail Summary Customers <span className="text-sm font-normal italic text-slate-500 tracking-normal">in home currency</span>
                 </DialogTitle>
-                <div className="relative w-full sm:w-56">
-                  <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                  <input
-                    type="text"
-                    placeholder="Cari customer..."
-                    value={summarySearch}
-                    onChange={(e) => setSummarySearch(e.target.value)}
-                    className="w-full text-xs pl-8 pr-3 py-1.5 rounded-lg border border-gray-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-200 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-theme-orange"
-                  />
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={() => exportToExcel(sortedSummaryModal, "Detail_Summary_Customers", columnMapping)}
+                    disabled={sortedSummaryModal.length === 0}
+                    className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-lg text-xs transition-colors cursor-pointer disabled:opacity-40"
+                    title="Export to Excel"
+                  >
+                    <Download className="w-3.5 h-3.5" />
+                    <span>Excel</span>
+                  </button>
+                  <div className="relative w-full sm:w-56">
+                    <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                    <input
+                      type="text"
+                      placeholder="Cari customer..."
+                      value={summarySearch}
+                      onChange={(e) => setSummarySearch(e.target.value)}
+                      className="w-full text-xs pl-8 pr-3 py-1.5 rounded-lg border border-gray-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-200 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-theme-orange"
+                    />
+                  </div>
                 </div>
               </DialogHeader>
-              <div className="overflow-auto flex-1">
+              <div className="overflow-auto flex-1 p-6">
                 <table className="w-full text-left border-collapse whitespace-nowrap text-xs">
                   <thead>
                     <tr className="bg-theme-brown text-white text-[10px] uppercase font-bold tracking-wider h-10 sticky top-0 z-10">

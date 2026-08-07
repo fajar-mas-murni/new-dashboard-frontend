@@ -20,15 +20,21 @@ export const formatPaidAmount = (val: number | undefined | null): string => {
 export const formatDate = (dateStr: string | undefined | null): string => {
   if (!dateStr) return "-";
   try {
+    const cleanStr = dateStr.includes("T") ? dateStr.split("T")[0] : dateStr;
+    const [year, month, day] = cleanStr.split("-").map(Number);
+    if (year && month && day) {
+      const months = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agt", "Sep", "Okt", "Nov", "Des"];
+      return `${day} ${months[month - 1] || ""} ${year}`;
+    }
     const date = new Date(dateStr);
-    if (isNaN(date.getTime())) return dateStr;
+    if (isNaN(date.getTime())) return cleanStr;
     return new Intl.DateTimeFormat("id-ID", {
       day: "numeric",
       month: "short",
       year: "numeric",
     }).format(date);
   } catch {
-    return dateStr;
+    return dateStr.includes("T") ? dateStr.split("T")[0] : dateStr;
   }
 };
 

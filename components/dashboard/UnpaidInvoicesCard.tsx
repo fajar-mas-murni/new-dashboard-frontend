@@ -1,13 +1,14 @@
 "use client";
 
 import React, { useState } from "react";
-import { Receipt, Search } from "lucide-react";
+import { Receipt, Search, Download } from "lucide-react";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
 import { ArSummaryResponse, UnpaidInvoice, FilterCategory } from "@/types/ar";
 import { formatAmount, formatDate, isCustomerInCategory } from "@/lib/formatters";
 import { sortData, handleToggleSort, renderSortableHeader } from "@/lib/table-utils";
+import { exportToExcel } from "@/lib/excel-export";
 
 interface UnpaidInvoicesCardProps {
   data: ArSummaryResponse | null;
@@ -58,6 +59,15 @@ export function UnpaidInvoicesCard({
     unpaidModalPage * itemsPerPageModal
   );
 
+  const columnMapping = {
+    customer: "Customer",
+    branch: "Branch",
+    number: "Invoice Number",
+    date: "Date",
+    dueDate: "Due Date",
+    amountDue: "Amount Due",
+  };
+
   return (
     <Card className="bg-white/95 dark:bg-slate-900/95 rounded-2xl border border-gray-200/80 dark:border-slate-800/40 shadow-sm overflow-hidden flex flex-col h-[500px]">
       <CardHeader className="px-5 py-4 flex flex-row items-center justify-between gap-2.5 flex-shrink-0">
@@ -68,52 +78,26 @@ export function UnpaidInvoicesCard({
             <span className="text-sm font-normal italic text-slate-500 tracking-normal">in home currency</span>
           </CardTitle>
         </div>
+        <button
+          onClick={() => exportToExcel(sortedUnpaid, "Unpaid_Invoices", columnMapping)}
+          disabled={loading || sortedUnpaid.length === 0}
+          className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-lg text-xs transition-colors cursor-pointer disabled:opacity-40"
+          title="Export to Excel"
+        >
+          <Download className="w-3.5 h-3.5" />
+          <span>Excel</span>
+        </button>
       </CardHeader>
       <Separator />
       <div className="overflow-auto flex-1">
         <table className="w-full text-left border-collapse whitespace-nowrap">
           <thead>
             <tr className="bg-[#1A3644] text-white text-[10px] uppercase font-bold tracking-wider h-10 sticky top-0 z-10">
-              {renderSortableHeader(
-                "Customer",
-                "customer",
-                unpaidSortCol,
-                unpaidSortDir,
-                (c) => handleToggleSort(c, unpaidSortCol, unpaidSortDir, setUnpaidSortCol, setUnpaidSortDir),
-                "left"
-              )}
-              {renderSortableHeader(
-                "Number",
-                "number",
-                unpaidSortCol,
-                unpaidSortDir,
-                (c) => handleToggleSort(c, unpaidSortCol, unpaidSortDir, setUnpaidSortCol, setUnpaidSortDir),
-                "left"
-              )}
-              {renderSortableHeader(
-                "Date",
-                "date",
-                unpaidSortCol,
-                unpaidSortDir,
-                (c) => handleToggleSort(c, unpaidSortCol, unpaidSortDir, setUnpaidSortCol, setUnpaidSortDir),
-                "left"
-              )}
-              {renderSortableHeader(
-                "Due Date",
-                "dueDate",
-                unpaidSortCol,
-                unpaidSortDir,
-                (c) => handleToggleSort(c, unpaidSortCol, unpaidSortDir, setUnpaidSortCol, setUnpaidSortDir),
-                "left"
-              )}
-              {renderSortableHeader(
-                "Amount Due",
-                "amountDue",
-                unpaidSortCol,
-                unpaidSortDir,
-                (c) => handleToggleSort(c, unpaidSortCol, unpaidSortDir, setUnpaidSortCol, setUnpaidSortDir),
-                "right"
-              )}
+              {renderSortableHeader("Customer", "customer", unpaidSortCol, unpaidSortDir, (c) => handleToggleSort(c, unpaidSortCol, unpaidSortDir, setUnpaidSortCol, setUnpaidSortDir), "left")}
+              {renderSortableHeader("Number", "number", unpaidSortCol, unpaidSortDir, (c) => handleToggleSort(c, unpaidSortCol, unpaidSortDir, setUnpaidSortCol, setUnpaidSortDir), "left")}
+              {renderSortableHeader("Date", "date", unpaidSortCol, unpaidSortDir, (c) => handleToggleSort(c, unpaidSortCol, unpaidSortDir, setUnpaidSortCol, setUnpaidSortDir), "left")}
+              {renderSortableHeader("Due Date", "dueDate", unpaidSortCol, unpaidSortDir, (c) => handleToggleSort(c, unpaidSortCol, unpaidSortDir, setUnpaidSortCol, setUnpaidSortDir), "left")}
+              {renderSortableHeader("Amount Due", "amountDue", unpaidSortCol, unpaidSortDir, (c) => handleToggleSort(c, unpaidSortCol, unpaidSortDir, setUnpaidSortCol, setUnpaidSortDir), "right")}
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100 dark:divide-slate-800/50 text-xs">
@@ -138,8 +122,9 @@ export function UnpaidInvoicesCard({
                 <tr
                   key={idx}
                   onClick={() => setCustomer(customer === item.customer ? "all" : item.customer)}
-                  className={`hover:bg-slate-50 dark:hover:bg-slate-800/20 cursor-pointer transition-colors even:bg-slate-50/30 dark:even:bg-slate-800/5 h-11 ${customer === item.customer ? "bg-theme-orange/10 dark:bg-theme-orange/5" : ""
-                    }`}
+                  className={`hover:bg-slate-50 dark:hover:bg-slate-800/20 cursor-pointer transition-colors even:bg-slate-50/30 dark:even:bg-slate-800/5 h-11 ${
+                    customer === item.customer ? "bg-theme-orange/10 dark:bg-theme-orange/5" : ""
+                  }`}
                 >
                   <td className="px-4 py-3 font-semibold text-slate-700 dark:text-slate-300 truncate max-w-[150px]" title={item.customer}>
                     {item.customer}
@@ -170,23 +155,34 @@ export function UnpaidInvoicesCard({
               </span>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[90vw] lg:max-w-6xl w-full max-h-[88vh] flex flex-col bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-2xl p-0 overflow-hidden z-[70]">
-              <DialogHeader className="p-6 border-b border-gray-100 dark:border-slate-800 flex-shrink-0 flex flex-col sm:flex-row sm:items-center justify-between gap-3 pr-14 sm:pr-16">
+              <DialogHeader className="px-6 py-4 border-b border-gray-100 dark:border-slate-800 flex-shrink-0 flex flex-col sm:flex-row sm:items-center justify-between gap-3 pr-14 sm:pr-16">
                 <DialogTitle className="text-lg font-bold text-slate-800 dark:text-white flex items-center gap-2">
                   <Receipt className="w-5 h-5 text-theme-orange" />
                   Detail Unpaid Invoices <span className="text-sm font-normal italic text-slate-500 tracking-normal">in home currency</span>
                 </DialogTitle>
-                <div className="relative w-full sm:w-56">
-                  <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                  <input
-                    type="text"
-                    placeholder="Cari unpaid invoice..."
-                    value={unpaidSearch}
-                    onChange={(e) => setUnpaidSearch(e.target.value)}
-                    className="w-full text-xs pl-8 pr-3 py-1.5 rounded-lg border border-gray-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-200 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-theme-orange"
-                  />
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={() => exportToExcel(sortedUnpaidModal, "Detail_Unpaid_Invoices", columnMapping)}
+                    disabled={sortedUnpaidModal.length === 0}
+                    className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-lg text-xs transition-colors cursor-pointer disabled:opacity-40"
+                    title="Export to Excel"
+                  >
+                    <Download className="w-3.5 h-3.5" />
+                    <span>Excel</span>
+                  </button>
+                  <div className="relative w-full sm:w-56">
+                    <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                    <input
+                      type="text"
+                      placeholder="Cari unpaid invoice..."
+                      value={unpaidSearch}
+                      onChange={(e) => setUnpaidSearch(e.target.value)}
+                      className="w-full text-xs pl-8 pr-3 py-1.5 rounded-lg border border-gray-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-200 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-theme-orange"
+                    />
+                  </div>
                 </div>
               </DialogHeader>
-              <div className="overflow-auto flex-1">
+              <div className="overflow-auto flex-1 p-6">
                 <table className="w-full text-left border-collapse whitespace-nowrap text-xs">
                   <thead>
                     <tr className="bg-[#1A3644] text-white text-[10px] uppercase font-bold tracking-wider h-10 sticky top-0 z-10">

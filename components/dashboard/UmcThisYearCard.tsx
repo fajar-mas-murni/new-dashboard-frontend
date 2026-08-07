@@ -1,12 +1,13 @@
 "use client";
 
 import React, { useState } from "react";
-import { Receipt, Search } from "lucide-react";
+import { Receipt, Search, Download } from "lucide-react";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { ArSummaryResponse, UmcItem, FilterCategory } from "@/types/ar";
 import { formatAmount, formatDate, isCustomerInCategory } from "@/lib/formatters";
 import { sortData, handleToggleSort, renderSortableHeader } from "@/lib/table-utils";
+import { exportToExcel } from "@/lib/excel-export";
 
 interface UmcThisYearCardProps {
   data: ArSummaryResponse | null;
@@ -42,6 +43,15 @@ export function UmcThisYearCard({
   const paginatedUmc = sortedUmc.slice((umcPage - 1) * itemsPerPage, umcPage * itemsPerPage);
   const totalAmountHome = sortedUmc.reduce((sum, item) => sum + (item.amountInHomeCurrency || 0), 0);
 
+  const columnMapping = {
+    customer: "Customer",
+    invoiceNo: "Ref Nbr",
+    dueDate: "Due Date",
+    currency: "Currency",
+    amountInCurrency: "Amount in Currency",
+    amountInHomeCurrency: "Amount in Home Currency",
+  };
+
   return (
     <Card className="bg-white/95 dark:bg-slate-900/95 rounded-2xl border overflow-hidden flex flex-col h-[500px] mt-8 mb-4 transition-all duration-300 border-gray-200/80 dark:border-slate-800/40 shadow-sm">
       <CardHeader className="px-5 py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 flex-shrink-0">
@@ -52,18 +62,29 @@ export function UmcThisYearCard({
             <span className="text-sm font-normal italic text-slate-500 tracking-normal">in home currency</span>
           </CardTitle>
         </div>
-        <div className="relative w-full sm:w-56">
-          <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-          <input
-            type="text"
-            placeholder="Cari ref nbr / customer..."
-            value={umcSearch}
-            onChange={(e) => {
-              setUmcSearch(e.target.value);
-              setUmcPage(1);
-            }}
-            className="w-full text-xs pl-8 pr-3 py-1.5 rounded-lg border border-gray-200 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-900/80 text-slate-800 dark:text-slate-200 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-theme-orange transition-all"
-          />
+        <div className="flex items-center gap-2.5 w-full sm:w-auto">
+          <button
+            onClick={() => exportToExcel(sortedUmc, "UMC_This_Year", columnMapping)}
+            disabled={loading || sortedUmc.length === 0}
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-lg text-xs transition-colors cursor-pointer disabled:opacity-40"
+            title="Export to Excel"
+          >
+            <Download className="w-3.5 h-3.5" />
+            <span>Excel</span>
+          </button>
+          <div className="relative w-full sm:w-56">
+            <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+            <input
+              type="text"
+              placeholder="Cari ref nbr / customer..."
+              value={umcSearch}
+              onChange={(e) => {
+                setUmcSearch(e.target.value);
+                setUmcPage(1);
+              }}
+              className="w-full text-xs pl-8 pr-3 py-1.5 rounded-lg border border-gray-200 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-900/80 text-slate-800 dark:text-slate-200 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-theme-orange transition-all"
+            />
+          </div>
         </div>
       </CardHeader>
       <Separator />
