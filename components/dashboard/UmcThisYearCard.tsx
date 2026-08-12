@@ -46,7 +46,7 @@ export function UmcThisYearCard({
   const columnMapping = {
     customer: "Customer",
     invoiceNo: "Ref Nbr",
-    dueDate: "Due Date",
+    docDate: "Doc Date",
     currency: "Currency",
     amountInCurrency: "Amount in Currency",
     amountInHomeCurrency: "Amount in Home Currency",
@@ -94,7 +94,7 @@ export function UmcThisYearCard({
             <tr className="bg-[#1A3644] text-white text-[10px] uppercase font-bold tracking-wider h-10 sticky top-0 z-10">
               {renderSortableHeader("CUSTOMER", "customer", umcSortCol, umcSortDir, (c) => handleToggleSort(c, umcSortCol, umcSortDir, setUmcSortCol, setUmcSortDir), "left")}
               {renderSortableHeader("REF NBR", "invoiceNo", umcSortCol, umcSortDir, (c) => handleToggleSort(c, umcSortCol, umcSortDir, setUmcSortCol, setUmcSortDir), "left")}
-              {renderSortableHeader("DUE DATE", "dueDate", umcSortCol, umcSortDir, (c) => handleToggleSort(c, umcSortCol, umcSortDir, setUmcSortCol, setUmcSortDir), "left")}
+              {renderSortableHeader("DOC DATE", "docDate", umcSortCol, umcSortDir, (c) => handleToggleSort(c, umcSortCol, umcSortDir, setUmcSortCol, setUmcSortDir), "left")}
               {renderSortableHeader("CURRENCY", "currency", umcSortCol, umcSortDir, (c) => handleToggleSort(c, umcSortCol, umcSortDir, setUmcSortCol, setUmcSortDir), "left")}
               {renderSortableHeader("AMOUNT IN CURRENCY", "amountInCurrency", umcSortCol, umcSortDir, (c) => handleToggleSort(c, umcSortCol, umcSortDir, setUmcSortCol, setUmcSortDir), "right")}
               {renderSortableHeader("AMOUNT IN HOME CURRENCY", "amountInHomeCurrency", umcSortCol, umcSortDir, (c) => handleToggleSort(c, umcSortCol, umcSortDir, setUmcSortCol, setUmcSortDir), "right")}
@@ -128,7 +128,7 @@ export function UmcThisYearCard({
                     {item.customer}
                   </td>
                   <td className="px-4 py-3 font-medium text-slate-650 dark:text-slate-350">{item.invoiceNo}</td>
-                  <td className="px-4 py-3 font-medium text-slate-650 dark:text-slate-350">{formatDate(item.dueDate)}</td>
+                  <td className="px-4 py-3 font-medium text-slate-650 dark:text-slate-350">{formatDate(item.docDate)}</td>
                   <td className="px-4 py-3 font-medium text-slate-650 dark:text-slate-350">{item.currency || "-"}</td>
                   <td className="px-4 py-3 text-right font-medium text-slate-650 dark:text-slate-350">{formatAmount(item.amountInCurrency)}</td>
                   <td className="px-4 py-3 text-right font-bold text-slate-800 dark:text-slate-100">{formatAmount(item.amountInHomeCurrency)}</td>

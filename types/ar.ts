@@ -55,7 +55,7 @@ export interface CustomerInvoice {
 export interface UmcItem {
   customer: string;
   invoiceNo: string;
-  dueDate: string;
+  docDate: string;
   currency: string;
   amountInCurrency: number;
   amountInHomeCurrency: number;
