@@ -76,7 +76,7 @@ export interface ArSummaryResponse {
   "paid-invoices-summary": PaidInvoiceSummary[];
   "paid-vs-unpaid-monthly": PaidVsUnpaidMonthly[];
   "customer-invoices": CustomerInvoice[];
-  "all-umc-this-year": UmcItem[];
+  "all-umc-this-month": UmcItem[];
 }
 
 export type FilterCategory = "all" | "anak-usaha" | "non-anak-usaha";

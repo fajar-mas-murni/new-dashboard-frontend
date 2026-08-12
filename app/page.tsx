@@ -12,7 +12,7 @@ import { UnpaidInvoicesCard } from "@/components/dashboard/UnpaidInvoicesCard";
 import { PaidInvoicesCard } from "@/components/dashboard/PaidInvoicesCard";
 import { PaidInvoicesDonutCard } from "@/components/dashboard/PaidInvoicesDonutCard";
 import { CustomerInvoicesCard } from "@/components/dashboard/CustomerInvoicesCard";
-import { UmcThisYearCard } from "@/components/dashboard/UmcThisYearCard";
+import { UmcThisMonthCard } from "@/components/dashboard/UmcThisMonthCard";
 
 export default function Page() {
   const {
@@ -158,8 +158,8 @@ export default function Page() {
           category={category}
         />
 
-        {/* UMC This Year Datatable */}
-        <UmcThisYearCard
+        {/* UMC This Month Datatable */}
+        <UmcThisMonthCard
           data={data}
           loading={loading}
           customer={customer}

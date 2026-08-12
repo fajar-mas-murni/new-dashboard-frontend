@@ -9,25 +9,25 @@ import { formatAmount, formatDate, isCustomerInCategory } from "@/lib/formatters
 import { sortData, handleToggleSort, renderSortableHeader } from "@/lib/table-utils";
 import { exportToExcel } from "@/lib/excel-export";
 
-interface UmcThisYearCardProps {
+interface UmcThisMonthCardProps {
   data: ArSummaryResponse | null;
   loading: boolean;
   customer: string;
   category: FilterCategory;
 }
 
-export function UmcThisYearCard({
+export function UmcThisMonthCard({
   data,
   loading,
   customer,
   category,
-}: UmcThisYearCardProps) {
+}: UmcThisMonthCardProps) {
   const [umcSearch, setUmcSearch] = useState<string>("");
   const [umcSortCol, setUmcSortCol] = useState<keyof UmcItem>("amountInHomeCurrency");
   const [umcSortDir, setUmcSortDir] = useState<"asc" | "desc">("desc");
   const [umcPage, setUmcPage] = useState<number>(1);
 
-  const allUmc = data?.["all-umc-this-year"] || [];
+  const allUmc = data?.["all-umc-this-month"] || [];
   const filteredUmc = allUmc.filter(
     (item) =>
       (customer === "all" || item.customer === customer) &&
@@ -58,13 +58,13 @@ export function UmcThisYearCard({
         <div className="flex items-center gap-2.5">
           <Receipt className="w-5 h-5 text-theme-orange" />
           <CardTitle className="text-lg font-bold text-slate-800 dark:text-white flex items-center flex-wrap gap-x-1">
-            UMC This Year{" "}
+            UMC This Month{" "}
             <span className="text-sm font-normal italic text-slate-500 tracking-normal">in home currency</span>
           </CardTitle>
         </div>
         <div className="flex items-center gap-2.5 w-full sm:w-auto">
           <button
-            onClick={() => exportToExcel(sortedUmc, "UMC_This_Year", columnMapping)}
+            onClick={() => exportToExcel(sortedUmc, "UMC_This_Month", columnMapping)}
             disabled={loading || sortedUmc.length === 0}
             className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-lg text-xs transition-colors cursor-pointer disabled:opacity-40"
             title="Export to Excel"
