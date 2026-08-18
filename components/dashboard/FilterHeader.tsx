@@ -195,6 +195,7 @@ export function FilterHeader({
                       onSelect={(date) => {
                         if (date) setStartDate(toDateString(date));
                       }}
+                      captionLayout="dropdown"
                     />
                   </PopoverContent>
                 </Popover>
