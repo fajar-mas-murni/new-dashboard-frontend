@@ -24,6 +24,6 @@ jobs:
 
       - name: Deploy to FMM Finance Dashboard (IIS)
         run: |
-          xcopy "${{ github.workspace }}" "C:\inetpub\wwwroot\new-dashboard\new-dashboard-frontend" /MIR /XD .git .github node_modules
+          xcopy "${{ github.workspace }}" "C:\inetpub\wwwroot\new-dashboard\new-dashboard-frontend" /E /H /C /I /Y
 
       - run: echo "🍏 Deployment status is ${{ job.status }}."
