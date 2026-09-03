@@ -29,6 +29,7 @@ jobs:
 
   deploy-prod:
     needs: setup
+    if: github.ref_name == 'master'
     steps:
       - name: Copy to FMM Finance Dashboard (master branch)
         if: github.ref_name == 'master'
