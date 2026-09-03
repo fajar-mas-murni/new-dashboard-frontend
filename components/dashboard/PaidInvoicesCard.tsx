@@ -37,20 +37,26 @@ export function PaidInvoicesCard({
       (customer === "all" || item.customer === customer) &&
       (branch === "all" || String(item.branch) === String(branch)) &&
       isCustomerInCategory(item.customer, category) &&
-      (!paidSearch || item.customer.toLowerCase().includes(paidSearch.toLowerCase()))
+      (!paidSearch ||
+        item.customer.toLowerCase().includes(paidSearch.toLowerCase()) ||
+        (item.group && item.group.toLowerCase().includes(paidSearch.toLowerCase())) ||
+        (item.branch && item.branch.toLowerCase().includes(paidSearch.toLowerCase())))
   );
 
   const groupedPaidMap = new Map();
   filteredPaid.forEach((item: any) => {
-    if (!groupedPaidMap.has(item.customer)) {
-      groupedPaidMap.set(item.customer, {
+    const key = `${item.customer}|${item.group || ""}|${item.branch || ""}`;
+    if (!groupedPaidMap.has(key)) {
+      groupedPaidMap.set(key, {
         customer: item.customer,
+        group: item.group || "-",
+        branch: item.branch || "-",
         currentMonth: 0,
         lastMonth: 0,
         last12Month: 0,
       });
     }
-    const curr = groupedPaidMap.get(item.customer);
+    const curr = groupedPaidMap.get(key);
     curr.currentMonth += item.currentMonth || 0;
     curr.lastMonth += item.lastMonth || 0;
     curr.last12Month += item.last12Month || 0;
@@ -70,6 +76,8 @@ export function PaidInvoicesCard({
 
   const columnMapping = {
     customer: "Customer",
+    branch: "Branch",
+    group: "Group",
     currentMonth: "Current Month",
     lastMonth: "Last Month",
     last12Month: "Last 12 Month",
@@ -99,7 +107,7 @@ export function PaidInvoicesCard({
             <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" />
             <input
               type="text"
-              placeholder="Cari..."
+              placeholder="Cari customer / group / branch..."
               value={paidSearch}
               onChange={(e) => {
                 setPaidSearch(e.target.value);
@@ -116,6 +124,8 @@ export function PaidInvoicesCard({
           <thead>
             <tr className="bg-theme-brown text-white text-[10px] uppercase font-bold tracking-wider h-10 sticky top-0 z-10">
               {renderSortableHeader("Customer", "customer", paidSortCol, paidSortDir, (c) => handleToggleSort(c, paidSortCol, paidSortDir, setPaidSortCol, setPaidSortDir), "left")}
+              {renderSortableHeader("Branch", "branch", paidSortCol, paidSortDir, (c) => handleToggleSort(c, paidSortCol, paidSortDir, setPaidSortCol, setPaidSortDir), "left")}
+              {renderSortableHeader("Group", "group", paidSortCol, paidSortDir, (c) => handleToggleSort(c, paidSortCol, paidSortDir, setPaidSortCol, setPaidSortDir), "left")}
               {renderSortableHeader("Current Month", "currentMonth", paidSortCol, paidSortDir, (c) => handleToggleSort(c, paidSortCol, paidSortDir, setPaidSortCol, setPaidSortDir), "right")}
               {renderSortableHeader("Last Month", "lastMonth", paidSortCol, paidSortDir, (c) => handleToggleSort(c, paidSortCol, paidSortDir, setPaidSortCol, setPaidSortDir), "right")}
               {renderSortableHeader("Last 12 Month", "last12Month", paidSortCol, paidSortDir, (c) => handleToggleSort(c, paidSortCol, paidSortDir, setPaidSortCol, setPaidSortDir), "right")}
@@ -126,6 +136,8 @@ export function PaidInvoicesCard({
               Array.from({ length: 8 }).map((_, i) => (
                 <tr key={i} className="animate-pulse h-11">
                   <td className="px-4 py-3"><div className="h-3 w-32 bg-slate-200 dark:bg-slate-800 rounded"></div></td>
+                  <td className="px-4 py-3"><div className="h-3 w-14 bg-slate-200 dark:bg-slate-800 rounded"></div></td>
+                  <td className="px-4 py-3"><div className="h-3 w-16 bg-slate-200 dark:bg-slate-800 rounded"></div></td>
                   <td className="px-4 py-3"><div className="h-3 w-16 bg-slate-200 dark:bg-slate-800 rounded ml-auto"></div></td>
                   <td className="px-4 py-3"><div className="h-3 w-16 bg-slate-200 dark:bg-slate-800 rounded ml-auto"></div></td>
                   <td className="px-4 py-3"><div className="h-3 w-20 bg-slate-200 dark:bg-slate-800 rounded ml-auto"></div></td>
@@ -133,7 +145,7 @@ export function PaidInvoicesCard({
               ))
             ) : sortedPaid.length === 0 ? (
               <tr>
-                <td colSpan={4} className="px-4 py-12 text-center text-slate-400 dark:text-slate-500 font-medium h-[352px]">
+                <td colSpan={6} className="px-4 py-12 text-center text-slate-400 dark:text-slate-500 font-medium h-[352px]">
                   No data found
                 </td>
               </tr>
@@ -172,6 +184,12 @@ export function PaidInvoicesCard({
                   >
                     <td className="px-4 py-3 font-semibold text-slate-700 dark:text-slate-300 truncate max-w-[180px]" title={item.customer}>
                       {item.customer}
+                    </td>
+                    <td className="px-4 py-3 font-medium text-slate-600 dark:text-slate-400 truncate max-w-[100px]" title={item.branch}>
+                      {item.branch || "-"}
+                    </td>
+                    <td className="px-4 py-3 font-medium text-slate-600 dark:text-slate-400 truncate max-w-[100px]" title={item.group}>
+                      {item.group || "-"}
                     </td>
                     <td className={`px-4 py-3 text-right ${currentText}`} style={{ backgroundColor: currentBg }}>
                       {item.currentMonth ? formatPaidAmount(item.currentMonth) : "0"}

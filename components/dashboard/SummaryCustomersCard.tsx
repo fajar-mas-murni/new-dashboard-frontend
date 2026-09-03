@@ -45,7 +45,11 @@ export function SummaryCustomersCard({
   const totalSummaryAmountDue = filteredSummaryBase.reduce((sum, item) => sum + (item.amountDue || 0), 0);
 
   const filteredSummaryModal = filteredSummaryBase.filter(
-    (item) => !summarySearch || item.customer.toLowerCase().includes(summarySearch.toLowerCase())
+    (item) =>
+      !summarySearch ||
+      item.customer.toLowerCase().includes(summarySearch.toLowerCase()) ||
+      (item.group && item.group.toLowerCase().includes(summarySearch.toLowerCase())) ||
+      (item.branch && item.branch.toLowerCase().includes(summarySearch.toLowerCase()))
   );
   const sortedSummaryModal = sortData(filteredSummaryModal, summarySortCol, summarySortDir);
 
@@ -59,6 +63,7 @@ export function SummaryCustomersCard({
   const columnMapping = {
     customer: "Customer",
     branch: "Branch",
+    group: "Group",
     current: "Current",
     "1-30": "1-30",
     "31-60": "31-60",
@@ -94,6 +99,8 @@ export function SummaryCustomersCard({
           <thead>
             <tr className="bg-theme-brown text-white text-[10px] uppercase font-bold tracking-wider h-10 sticky top-0 z-10">
               {renderSortableHeader("Customer", "customer", summarySortCol, summarySortDir, (c) => handleToggleSort(c, summarySortCol, summarySortDir, setSummarySortCol, setSummarySortDir), "left")}
+              {renderSortableHeader("Branch", "branch", summarySortCol, summarySortDir, (c) => handleToggleSort(c, summarySortCol, summarySortDir, setSummarySortCol, setSummarySortDir), "left")}
+              {renderSortableHeader("Group", "group", summarySortCol, summarySortDir, (c) => handleToggleSort(c, summarySortCol, summarySortDir, setSummarySortCol, setSummarySortDir), "left")}
               {renderSortableHeader("Current", "current", summarySortCol, summarySortDir, (c) => handleToggleSort(c, summarySortCol, summarySortDir, setSummarySortCol, setSummarySortDir), "right")}
               {renderSortableHeader("1-30", "1-30", summarySortCol, summarySortDir, (c) => handleToggleSort(c, summarySortCol, summarySortDir, setSummarySortCol, setSummarySortDir), "right")}
               {renderSortableHeader("31-60", "31-60", summarySortCol, summarySortDir, (c) => handleToggleSort(c, summarySortCol, summarySortDir, setSummarySortCol, setSummarySortDir), "right")}
@@ -108,6 +115,8 @@ export function SummaryCustomersCard({
               Array.from({ length: 8 }).map((_, i) => (
                 <tr key={i} className="animate-pulse h-11">
                   <td className="px-4 py-3"><div className="h-3 w-24 bg-slate-200 dark:bg-slate-800 rounded"></div></td>
+                  <td className="px-4 py-3"><div className="h-3 w-14 bg-slate-200 dark:bg-slate-800 rounded"></div></td>
+                  <td className="px-4 py-3"><div className="h-3 w-16 bg-slate-200 dark:bg-slate-800 rounded"></div></td>
                   <td className="px-4 py-3"><div className="h-3 w-12 bg-slate-200 dark:bg-slate-800 rounded ml-auto"></div></td>
                   <td className="px-4 py-3"><div className="h-3 w-12 bg-slate-200 dark:bg-slate-800 rounded ml-auto"></div></td>
                   <td className="px-4 py-3"><div className="h-3 w-12 bg-slate-200 dark:bg-slate-800 rounded ml-auto"></div></td>
@@ -119,7 +128,7 @@ export function SummaryCustomersCard({
               ))
             ) : top10Summary.length === 0 ? (
               <tr>
-                <td colSpan={8} className="px-4 py-12 text-center text-slate-400 dark:text-slate-500 font-medium h-[352px]">
+                <td colSpan={10} className="px-4 py-12 text-center text-slate-400 dark:text-slate-500 font-medium h-[352px]">
                   No data found
                 </td>
               </tr>
@@ -134,6 +143,12 @@ export function SummaryCustomersCard({
                 >
                   <td className="px-4 py-3 font-semibold text-slate-700 dark:text-slate-300 truncate max-w-[120px]" title={item.customer}>
                     {item.customer}
+                  </td>
+                  <td className="px-4 py-3 font-medium text-slate-600 dark:text-slate-400 truncate max-w-[100px]" title={item.branch}>
+                    {item.branch || "-"}
+                  </td>
+                  <td className="px-4 py-3 font-medium text-slate-600 dark:text-slate-400 truncate max-w-[100px]" title={item.group}>
+                    {item.group || "-"}
                   </td>
                   <td className="px-4 py-3 text-right font-medium text-slate-650 dark:text-slate-350">
                     {item.current ? formatAmount(item.current) : "0"}
@@ -195,7 +210,7 @@ export function SummaryCustomersCard({
                     <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
                     <input
                       type="text"
-                      placeholder="Cari customer..."
+                      placeholder="Cari customer / group / branch..."
                       value={summarySearch}
                       onChange={(e) => setSummarySearch(e.target.value)}
                       className="w-full text-xs pl-8 pr-3 py-1.5 rounded-lg border border-gray-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-200 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-theme-orange"
@@ -208,6 +223,8 @@ export function SummaryCustomersCard({
                   <thead>
                     <tr className="bg-theme-brown text-white text-[10px] uppercase font-bold tracking-wider h-10 sticky top-0 z-10">
                       {renderSortableHeader("Customer", "customer", summarySortCol, summarySortDir, (c) => handleToggleSort(c, summarySortCol, summarySortDir, setSummarySortCol, setSummarySortDir), "left")}
+                      {renderSortableHeader("Branch", "branch", summarySortCol, summarySortDir, (c) => handleToggleSort(c, summarySortCol, summarySortDir, setSummarySortCol, setSummarySortDir), "left")}
+                      {renderSortableHeader("Group", "group", summarySortCol, summarySortDir, (c) => handleToggleSort(c, summarySortCol, summarySortDir, setSummarySortCol, setSummarySortDir), "left")}
                       {renderSortableHeader("Current", "current", summarySortCol, summarySortDir, (c) => handleToggleSort(c, summarySortCol, summarySortDir, setSummarySortCol, setSummarySortDir), "right")}
                       {renderSortableHeader("1-30", "1-30", summarySortCol, summarySortDir, (c) => handleToggleSort(c, summarySortCol, summarySortDir, setSummarySortCol, setSummarySortDir), "right")}
                       {renderSortableHeader("31-60", "31-60", summarySortCol, summarySortDir, (c) => handleToggleSort(c, summarySortCol, summarySortDir, setSummarySortCol, setSummarySortDir), "right")}
@@ -221,6 +238,8 @@ export function SummaryCustomersCard({
                     {paginatedSummaryModal.map((item, idx) => (
                       <tr key={idx} className="hover:bg-slate-50 dark:hover:bg-slate-800/20 even:bg-slate-50/30 dark:even:bg-slate-800/5 h-11">
                         <td className="px-4 py-3 font-semibold text-slate-700 dark:text-slate-300">{item.customer}</td>
+                        <td className="px-4 py-3 font-medium text-slate-600 dark:text-slate-400">{item.branch || "-"}</td>
+                        <td className="px-4 py-3 font-medium text-slate-600 dark:text-slate-400">{item.group || "-"}</td>
                         <td className="px-4 py-3 text-right font-medium">{item.current ? formatAmount(item.current) : "0"}</td>
                         <td className="px-4 py-3 text-right font-medium">{item["1-30"] ? formatAmount(item["1-30"]) : "0"}</td>
                         <td className="px-4 py-3 text-right font-medium">{item["31-60"] ? formatAmount(item["31-60"]) : "0"}</td>

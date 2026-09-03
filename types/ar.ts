@@ -1,12 +1,14 @@
 export interface CustomerUnpaid {
   customer: string;
   branch: string;
+  group?: string;
   amount: number;
 }
 
 export interface CustomerSummary {
   customer: string;
   branch: string;
+  group?: string;
   current: number;
   "1-30": number;
   "31-60": number;
@@ -19,6 +21,7 @@ export interface CustomerSummary {
 export interface UnpaidInvoice {
   customer: string;
   branch: string;
+  group?: string;
   number: string;
   date: string;
   dueDate: string;
@@ -28,6 +31,7 @@ export interface UnpaidInvoice {
 export interface PaidInvoiceSummary {
   customer: string;
   branch: string;
+  group?: string;
   currentMonth: number;
   lastMonth: number;
   last12Month: number;
@@ -37,6 +41,7 @@ export interface PaidVsUnpaidMonthly {
   customer?: string;
   period: string;
   branch: string;
+  group?: string;
   paid: number;
   unpaid: number;
 }
@@ -64,6 +69,7 @@ export interface UmcItem {
 export interface ArSummaryResponse {
   summary: {
     branch: string;
+    group?: string;
     customer: string;
     "unpaid-invoice": number;
     "overdue-amount": number;

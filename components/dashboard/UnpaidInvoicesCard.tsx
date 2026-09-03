@@ -48,6 +48,8 @@ export function UnpaidInvoicesCard({
     (item) =>
       !unpaidSearch ||
       item.customer.toLowerCase().includes(unpaidSearch.toLowerCase()) ||
+      (item.group && item.group.toLowerCase().includes(unpaidSearch.toLowerCase())) ||
+      (item.branch && item.branch.toLowerCase().includes(unpaidSearch.toLowerCase())) ||
       (item.number && item.number.toLowerCase().includes(unpaidSearch.toLowerCase()))
   );
   const sortedUnpaidModal = sortData(filteredUnpaidModal, unpaidSortCol, unpaidSortDir);
@@ -62,6 +64,7 @@ export function UnpaidInvoicesCard({
   const columnMapping = {
     customer: "Customer",
     branch: "Branch",
+    group: "Group",
     number: "Invoice Number",
     date: "Date",
     dueDate: "Due Date",
@@ -94,6 +97,8 @@ export function UnpaidInvoicesCard({
           <thead>
             <tr className="bg-[#1A3644] text-white text-[10px] uppercase font-bold tracking-wider h-10 sticky top-0 z-10">
               {renderSortableHeader("Customer", "customer", unpaidSortCol, unpaidSortDir, (c) => handleToggleSort(c, unpaidSortCol, unpaidSortDir, setUnpaidSortCol, setUnpaidSortDir), "left")}
+              {renderSortableHeader("Branch", "branch", unpaidSortCol, unpaidSortDir, (c) => handleToggleSort(c, unpaidSortCol, unpaidSortDir, setUnpaidSortCol, setUnpaidSortDir), "left")}
+              {renderSortableHeader("Group", "group", unpaidSortCol, unpaidSortDir, (c) => handleToggleSort(c, unpaidSortCol, unpaidSortDir, setUnpaidSortCol, setUnpaidSortDir), "left")}
               {renderSortableHeader("Number", "number", unpaidSortCol, unpaidSortDir, (c) => handleToggleSort(c, unpaidSortCol, unpaidSortDir, setUnpaidSortCol, setUnpaidSortDir), "left")}
               {renderSortableHeader("Date", "date", unpaidSortCol, unpaidSortDir, (c) => handleToggleSort(c, unpaidSortCol, unpaidSortDir, setUnpaidSortCol, setUnpaidSortDir), "left")}
               {renderSortableHeader("Due Date", "dueDate", unpaidSortCol, unpaidSortDir, (c) => handleToggleSort(c, unpaidSortCol, unpaidSortDir, setUnpaidSortCol, setUnpaidSortDir), "left")}
@@ -105,6 +110,8 @@ export function UnpaidInvoicesCard({
               Array.from({ length: 8 }).map((_, i) => (
                 <tr key={i} className="animate-pulse h-11">
                   <td className="px-4 py-3"><div className="h-3 w-24 bg-slate-200 dark:bg-slate-800 rounded"></div></td>
+                  <td className="px-4 py-3"><div className="h-3 w-14 bg-slate-200 dark:bg-slate-800 rounded"></div></td>
+                  <td className="px-4 py-3"><div className="h-3 w-16 bg-slate-200 dark:bg-slate-800 rounded"></div></td>
                   <td className="px-4 py-3"><div className="h-3 w-16 bg-slate-200 dark:bg-slate-800 rounded"></div></td>
                   <td className="px-4 py-3"><div className="h-3 w-14 bg-slate-200 dark:bg-slate-800 rounded"></div></td>
                   <td className="px-4 py-3"><div className="h-3 w-14 bg-slate-200 dark:bg-slate-800 rounded"></div></td>
@@ -113,7 +120,7 @@ export function UnpaidInvoicesCard({
               ))
             ) : top10Unpaid.length === 0 ? (
               <tr>
-                <td colSpan={5} className="px-4 py-12 text-center text-slate-400 dark:text-slate-500 font-medium h-[352px]">
+                <td colSpan={7} className="px-4 py-12 text-center text-slate-400 dark:text-slate-500 font-medium h-[352px]">
                   No data found
                 </td>
               </tr>
@@ -128,6 +135,12 @@ export function UnpaidInvoicesCard({
                 >
                   <td className="px-4 py-3 font-semibold text-slate-700 dark:text-slate-300 truncate max-w-[150px]" title={item.customer}>
                     {item.customer}
+                  </td>
+                  <td className="px-4 py-3 font-medium text-slate-600 dark:text-slate-400 truncate max-w-[100px]" title={item.branch}>
+                    {item.branch || "-"}
+                  </td>
+                  <td className="px-4 py-3 font-medium text-slate-600 dark:text-slate-400 truncate max-w-[100px]" title={item.group}>
+                    {item.group || "-"}
                   </td>
                   <td className="px-4 py-3 font-medium text-slate-600 dark:text-slate-400">{item.number}</td>
                   <td className="px-4 py-3 text-slate-600 dark:text-slate-450">{formatDate(item.date)}</td>
@@ -174,7 +187,7 @@ export function UnpaidInvoicesCard({
                     <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
                     <input
                       type="text"
-                      placeholder="Cari unpaid invoice..."
+                      placeholder="Cari unpaid invoice / group / branch..."
                       value={unpaidSearch}
                       onChange={(e) => setUnpaidSearch(e.target.value)}
                       className="w-full text-xs pl-8 pr-3 py-1.5 rounded-lg border border-gray-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-200 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-theme-orange"
@@ -187,6 +200,8 @@ export function UnpaidInvoicesCard({
                   <thead>
                     <tr className="bg-[#1A3644] text-white text-[10px] uppercase font-bold tracking-wider h-10 sticky top-0 z-10">
                       {renderSortableHeader("Customer", "customer", unpaidSortCol, unpaidSortDir, (c) => handleToggleSort(c, unpaidSortCol, unpaidSortDir, setUnpaidSortCol, setUnpaidSortDir), "left")}
+                      {renderSortableHeader("Branch", "branch", unpaidSortCol, unpaidSortDir, (c) => handleToggleSort(c, unpaidSortCol, unpaidSortDir, setUnpaidSortCol, setUnpaidSortDir), "left")}
+                      {renderSortableHeader("Group", "group", unpaidSortCol, unpaidSortDir, (c) => handleToggleSort(c, unpaidSortCol, unpaidSortDir, setUnpaidSortCol, setUnpaidSortDir), "left")}
                       {renderSortableHeader("Number", "number", unpaidSortCol, unpaidSortDir, (c) => handleToggleSort(c, unpaidSortCol, unpaidSortDir, setUnpaidSortCol, setUnpaidSortDir), "left")}
                       {renderSortableHeader("Date", "date", unpaidSortCol, unpaidSortDir, (c) => handleToggleSort(c, unpaidSortCol, unpaidSortDir, setUnpaidSortCol, setUnpaidSortDir), "left")}
                       {renderSortableHeader("Due Date", "dueDate", unpaidSortCol, unpaidSortDir, (c) => handleToggleSort(c, unpaidSortCol, unpaidSortDir, setUnpaidSortCol, setUnpaidSortDir), "left")}
@@ -197,6 +212,8 @@ export function UnpaidInvoicesCard({
                     {paginatedUnpaidModal.map((item, idx) => (
                       <tr key={idx} className="hover:bg-slate-50 dark:hover:bg-slate-800/20 even:bg-slate-50/30 dark:even:bg-slate-800/5 h-11">
                         <td className="px-4 py-3 font-semibold text-slate-700 dark:text-slate-300">{item.customer}</td>
+                        <td className="px-4 py-3 font-medium text-slate-600 dark:text-slate-400">{item.branch || "-"}</td>
+                        <td className="px-4 py-3 font-medium text-slate-600 dark:text-slate-400">{item.group || "-"}</td>
                         <td className="px-4 py-3 font-medium text-slate-650 dark:text-slate-400">{item.number}</td>
                         <td className="px-4 py-3 text-slate-600 dark:text-slate-450">{formatDate(item.date)}</td>
                         <td className="px-4 py-3 text-slate-600 dark:text-slate-450">{formatDate(item.dueDate)}</td>
