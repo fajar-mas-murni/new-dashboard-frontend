@@ -1,11 +1,13 @@
 name: GitHub Actions
 run-name: ${{ github.actor }} is testing out GitHub Actions 🚀
 
-on: [push]
+on: 
+  push: [ master ]
 
 jobs:
-  Explore-GitHub-Actions:
+  setup:
     runs-on: self-hosted
+    environment: production
     steps:
       - name: Check out repository code
         uses: actions/checkout@v4
@@ -18,11 +20,16 @@ jobs:
 
       - name: Build Project
         run: npm run build
+        env: 
+          NEXT_PUBLIC_API_URL: ${{ vars.NEXT_PUBLIC_API_URL }}
 
       - name: List files in the repository
         run: |
           ls ${{ github.workspace }}
 
+  deploy-prod:
+    needs: setup
+    steps:
       - name: Copy to FMM Finance Dashboard (master branch)
         if: github.ref_name == 'master'
         run: |
