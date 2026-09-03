@@ -6,7 +6,7 @@ import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
 import { ArSummaryResponse, CustomerSummary, FilterCategory } from "@/types/ar";
-import { formatAmount, isCustomerInCategory } from "@/lib/formatters";
+import { formatAmount, isCustomerInCategory, isGroupMatch } from "@/lib/formatters";
 import { sortData, handleToggleSort, renderSortableHeader } from "@/lib/table-utils";
 import { exportToExcel } from "@/lib/excel-export";
 
@@ -14,6 +14,7 @@ interface SummaryCustomersCardProps {
   data: ArSummaryResponse | null;
   loading: boolean;
   branch: string;
+  group: string;
   customer: string;
   category: FilterCategory;
   setCustomer: (cust: string) => void;
@@ -23,6 +24,7 @@ export function SummaryCustomersCard({
   data,
   loading,
   branch,
+  group,
   customer,
   category,
   setCustomer,
@@ -37,6 +39,7 @@ export function SummaryCustomersCard({
     (item) =>
       (customer === "all" || item.customer === customer) &&
       (branch === "all" || String(item.branch) === String(branch)) &&
+      isGroupMatch(item.group, group) &&
       isCustomerInCategory(item.customer, category)
   );
 

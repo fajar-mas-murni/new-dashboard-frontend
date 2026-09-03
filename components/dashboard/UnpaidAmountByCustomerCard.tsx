@@ -1,16 +1,16 @@
 "use client";
 
-import React from "react";
 import { BarChart3 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { ArSummaryResponse, FilterCategory } from "@/types/ar";
-import { isCustomerInCategory } from "@/lib/formatters";
+import { isCustomerInCategory, isGroupMatch } from "@/lib/formatters";
 
 interface UnpaidAmountByCustomerCardProps {
   data: ArSummaryResponse | null;
   loading: boolean;
   branch: string;
+  group: string;
   customer: string;
   category: FilterCategory;
   setCustomer: (cust: string) => void;
@@ -20,6 +20,7 @@ export function UnpaidAmountByCustomerCard({
   data,
   loading,
   branch,
+  group,
   customer,
   category,
   setCustomer,
@@ -68,6 +69,7 @@ export function UnpaidAmountByCustomerCard({
   const branchFilteredTop = rawTop.filter(
     (item: any) =>
       (branch === "all" || String(item.branch) === String(branch)) &&
+      isGroupMatch(item.group, group) &&
       isCustomerInCategory(item.customer, category)
   );
 

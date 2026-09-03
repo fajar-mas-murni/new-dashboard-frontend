@@ -23,6 +23,7 @@ export function useArData() {
   const [category, setCategory] = useState<FilterCategory>("all");
   const [customer, setCustomer] = useState<string>("all");
   const [branch, setBranch] = useState<string>("all");
+  const [group, setGroup] = useState<string>("all");
 
   useEffect(() => {
     setMounted(true);
@@ -91,10 +92,38 @@ export function useArData() {
 
     const summaryCust = data["summary-customer"] || [];
     summaryCust.forEach(item => {
-      if (item.branch) branches.add(String(item.branch));
+      if (item.branch && item.branch !== "Unknown") branches.add(String(item.branch));
     });
 
     return Array.from(branches).sort((a, b) => a.localeCompare(b));
+  }, [data]);
+
+  // Derived unique groups for filter dropdown
+  const groupList = useMemo(() => {
+    if (!data) return [];
+    const groups = new Set<string>();
+    let hasUnknown = false;
+
+    const checkItem = (grp?: string | null) => {
+      if (!grp || grp === "-" || grp.trim() === "" || grp === "Unknown") {
+        hasUnknown = true;
+      } else {
+        groups.add(grp.trim());
+      }
+    };
+
+    (data["summary"] || []).forEach(item => checkItem(item.group));
+    (data["top-10-unpaid-customers"] || []).forEach(item => checkItem(item.group));
+    (data["summary-customer"] || []).forEach(item => checkItem(item.group));
+    (data["summary-unpaid"] || []).forEach(item => checkItem(item.group));
+    (data["paid-invoices-summary"] || []).forEach(item => checkItem(item.group));
+    (data["paid-vs-unpaid-monthly"] || []).forEach(item => checkItem(item.group));
+
+    const sortedGroups = Array.from(groups).sort((a, b) => a.localeCompare(b));
+    if (hasUnknown) {
+      sortedGroups.push("Unknown");
+    }
+    return sortedGroups;
   }, [data]);
 
   return {
@@ -112,8 +141,11 @@ export function useArData() {
     setCustomer,
     branch,
     setBranch,
+    group,
+    setGroup,
     customerList,
     branchList,
+    groupList,
     refetch: fetchData,
   };
 }

@@ -30,6 +30,9 @@ export default function Page() {
     setCustomer,
     branch,
     setBranch,
+    group,
+    setGroup,
+    groupList,
     refetch,
   } = useArData();
 
@@ -69,6 +72,9 @@ export default function Page() {
           setCustomer={setCustomer}
           branch={branch}
           setBranch={setBranch}
+          group={group}
+          setGroup={setGroup}
+          groupList={groupList}
           loading={loading}
           mounted={mounted}
           onRefresh={refetch}
@@ -87,6 +93,7 @@ export default function Page() {
           data={data}
           loading={loading}
           branch={branch}
+          group={group}
           customer={customer}
           category={category}
         />
@@ -96,6 +103,7 @@ export default function Page() {
           data={data}
           loading={loading}
           branch={branch}
+          group={group}
           customer={customer}
           category={category}
           setCustomer={setCustomer}
@@ -107,6 +115,7 @@ export default function Page() {
             data={data}
             loading={loading}
             branch={branch}
+            group={group}
             customer={customer}
             category={category}
             setCustomer={setCustomer}
@@ -115,6 +124,7 @@ export default function Page() {
             data={data}
             loading={loading}
             branch={branch}
+            group={group}
             customer={customer}
             category={category}
             setCustomer={setCustomer}
@@ -127,6 +137,7 @@ export default function Page() {
             data={data}
             loading={loading}
             branch={branch}
+            group={group}
             customer={customer}
             category={category}
             setCustomer={setCustomer}
@@ -135,6 +146,7 @@ export default function Page() {
             data={data}
             loading={loading}
             branch={branch}
+            group={group}
             customer={customer}
             category={category}
             setCustomer={setCustomer}
@@ -146,6 +158,7 @@ export default function Page() {
           data={data}
           loading={loading}
           branch={branch}
+          group={group}
           customer={customer}
           category={category}
         />

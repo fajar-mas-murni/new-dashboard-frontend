@@ -63,3 +63,13 @@ export const isCustomerInCategory = (custName: string | undefined | null, catego
   if (category === "non-anak-usaha") return !isAnakUsaha;
   return true;
 };
+
+export const isGroupMatch = (itemGroup: string | undefined | null, selectedGroup: string): boolean => {
+  if (selectedGroup === "all") return true;
+  const isUnknown = !itemGroup || itemGroup === "-" || itemGroup.trim() === "" || itemGroup === "Unknown";
+  if (selectedGroup === "Unknown") {
+    return isUnknown;
+  }
+  return String(itemGroup).trim() === selectedGroup;
+};
+

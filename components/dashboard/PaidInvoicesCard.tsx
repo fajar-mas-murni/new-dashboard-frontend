@@ -5,7 +5,7 @@ import { FileText, Search, Download } from "lucide-react";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { ArSummaryResponse, FilterCategory } from "@/types/ar";
-import { formatPaidAmount, isCustomerInCategory } from "@/lib/formatters";
+import { formatPaidAmount, isCustomerInCategory, isGroupMatch } from "@/lib/formatters";
 import { sortData, handleToggleSort, renderSortableHeader } from "@/lib/table-utils";
 import { exportToExcel } from "@/lib/excel-export";
 
@@ -13,6 +13,7 @@ interface PaidInvoicesCardProps {
   data: ArSummaryResponse | null;
   loading: boolean;
   branch: string;
+  group: string;
   customer: string;
   category: FilterCategory;
   setCustomer: (cust: string) => void;
@@ -22,6 +23,7 @@ export function PaidInvoicesCard({
   data,
   loading,
   branch,
+  group,
   customer,
   category,
   setCustomer,
@@ -36,6 +38,7 @@ export function PaidInvoicesCard({
     (item) =>
       (customer === "all" || item.customer === customer) &&
       (branch === "all" || String(item.branch) === String(branch)) &&
+      isGroupMatch(item.group, group) &&
       isCustomerInCategory(item.customer, category) &&
       (!paidSearch ||
         item.customer.toLowerCase().includes(paidSearch.toLowerCase()) ||

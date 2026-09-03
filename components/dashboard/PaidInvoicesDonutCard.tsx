@@ -5,12 +5,13 @@ import { Receipt } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { ArSummaryResponse, FilterCategory } from "@/types/ar";
-import { formatPaidAmount, isCustomerInCategory } from "@/lib/formatters";
+import { formatPaidAmount, isCustomerInCategory, isGroupMatch } from "@/lib/formatters";
 
 interface PaidInvoicesDonutCardProps {
   data: ArSummaryResponse | null;
   loading: boolean;
   branch: string;
+  group: string;
   customer: string;
   category: FilterCategory;
   setCustomer: (cust: string) => void;
@@ -20,6 +21,7 @@ export function PaidInvoicesDonutCard({
   data,
   loading,
   branch,
+  group,
   customer,
   category,
   setCustomer,
@@ -57,6 +59,7 @@ export function PaidInvoicesDonutCard({
             (item) =>
               (customer === "all" || item.customer === customer) &&
               (branch === "all" || String(item.branch) === String(branch)) &&
+              isGroupMatch(item.group, group) &&
               isCustomerInCategory(item.customer, category)
           );
 

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Filter, Calendar, RefreshCw, Building2, Users } from "lucide-react";
+import { Filter, Calendar, RefreshCw, Building2, Users, Layers } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { Calendar as ShadcnCalendar } from "@/components/ui/calendar";
@@ -19,6 +19,9 @@ interface FilterHeaderProps {
   setCustomer: (val: string) => void;
   branch: string;
   setBranch: (val: string) => void;
+  group: string;
+  setGroup: (val: string) => void;
+  groupList?: string[];
   loading: boolean;
   mounted: boolean;
   onRefresh: () => void;
@@ -35,6 +38,9 @@ export function FilterHeader({
   setCustomer,
   branch,
   setBranch,
+  group,
+  setGroup,
+  groupList = [],
   loading,
   mounted,
   onRefresh,
@@ -42,6 +48,7 @@ export function FilterHeader({
   const [categoryLabel, setCategoryLabel] = useState<string>("All Categories");
   const [customerLabel, setCustomerLabel] = useState<string>("All Customers");
   const [branchLabel, setBranchLabel] = useState<string>("All Branches");
+  const [groupLabel, setGroupLabel] = useState<string>("All Groups");
 
   const getDefaultStartDate = () => DEFAULT_START_DATE;
 
@@ -84,10 +91,16 @@ export function FilterHeader({
     label: item.CustomerName || item.CustomerCode,
   });
 
+  const groupOptions = (groupList || []).map((g) => ({
+    value: g,
+    label: g === "Unknown" ? "Unknown" : g,
+  }));
+
   const hasActiveFilters =
     category !== "all" ||
     customer !== "all" ||
     branch !== "all" ||
+    group !== "all" ||
     startDate !== getDefaultStartDate() ||
     endDate !== getDefaultEndDate();
 
@@ -133,6 +146,25 @@ export function FilterHeader({
                   pageSize={10}
                   className="w-full"
                   icon={<Building2 className="w-4 h-4" />}
+                />
+              </div>
+
+              {/* Group Filter */}
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs text-slate-500 dark:text-slate-400 font-medium">Group:</label>
+                <SearchableSelect
+                  value={group}
+                  selectedLabel={groupLabel}
+                  onValueChange={(val, label) => {
+                    setGroup(val);
+                    setGroupLabel(label);
+                  }}
+                  staticOptions={groupOptions}
+                  placeholder="Select group"
+                  allLabel="All Groups"
+                  pageSize={10}
+                  className="w-full"
+                  icon={<Layers className="w-4 h-4" />}
                 />
               </div>
 
@@ -228,11 +260,13 @@ export function FilterHeader({
                   setStartDate(getDefaultStartDate());
                   setEndDate(getDefaultEndDate());
                   setCategory("all");
-                  setCategoryLabel("All Customers");
+                  setCategoryLabel("All Categories");
                   setCustomer("all");
                   setCustomerLabel("All Customers");
                   setBranch("all");
                   setBranchLabel("All Branches");
+                  setGroup("all");
+                  setGroupLabel("All Groups");
                 }}
                 className="text-xs text-slate-500 hover:text-theme-orange font-semibold cursor-pointer transition-colors"
               >

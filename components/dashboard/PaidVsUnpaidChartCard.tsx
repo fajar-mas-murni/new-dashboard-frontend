@@ -5,12 +5,13 @@ import { BarChart3 } from "lucide-react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { ArSummaryResponse, FilterCategory } from "@/types/ar";
-import { formatPaidAmount, formatPeriod, isCustomerInCategory } from "@/lib/formatters";
+import { formatPaidAmount, formatPeriod, isCustomerInCategory, isGroupMatch } from "@/lib/formatters";
 
 interface PaidVsUnpaidChartCardProps {
   data: ArSummaryResponse | null;
   loading: boolean;
   branch: string;
+  group: string;
   customer: string;
   category: FilterCategory;
 }
@@ -19,6 +20,7 @@ export function PaidVsUnpaidChartCard({
   data,
   loading,
   branch,
+  group,
   customer,
   category,
 }: PaidVsUnpaidChartCardProps) {
@@ -43,6 +45,7 @@ export function PaidVsUnpaidChartCard({
           const branchFilteredMonthly = rawMonthlyData.filter(
             (item: any) =>
               (branch === "all" || String(item.branch) === String(branch)) &&
+              isGroupMatch(item.group, group) &&
               (customer === "all" || item.customer === customer) &&
               isCustomerInCategory(item.customer, category)
           );

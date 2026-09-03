@@ -4,12 +4,13 @@ import React from "react";
 import { FileText, Clock, Calendar, CalendarDays } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { ArSummaryResponse, FilterCategory } from "@/types/ar";
-import { formatAmount, isCustomerInCategory } from "@/lib/formatters";
+import { formatAmount, isCustomerInCategory, isGroupMatch } from "@/lib/formatters";
 
 interface KpiCardsSectionProps {
   data: ArSummaryResponse | null;
   loading: boolean;
   branch: string;
+  group: string;
   customer: string;
   category: FilterCategory;
 }
@@ -18,6 +19,7 @@ export function KpiCardsSection({
   data,
   loading,
   branch,
+  group,
   customer,
   category,
 }: KpiCardsSectionProps) {
@@ -25,6 +27,7 @@ export function KpiCardsSection({
   const branchFilteredSummary = rawSummary.filter(
     (item: any) =>
       (branch === "all" || String(item.branch) === String(branch)) &&
+      isGroupMatch(item.group, group) &&
       (customer === "all" || item.customer === customer) &&
       isCustomerInCategory(item.customer, category)
   );
