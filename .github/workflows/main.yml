@@ -6,15 +6,13 @@ on:
     branches: [ master ]
 
 jobs:
-  setup:
+  build-and-deploy:
     runs-on: self-hosted
     environment: production
+    
     steps:
       - name: Check out repository code
         uses: actions/checkout@v4
-
-      - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
-      - run: echo "🖥️ The workflow is now ready to test your code on the runner."
 
       - name: Install Dependencies
         run: npm install
@@ -24,17 +22,8 @@ jobs:
         env: 
           NEXT_PUBLIC_API_URL: ${{ vars.NEXT_PUBLIC_API_URL }}
 
-      - name: List files in the repository
+      - name: Deploy to FMM Finance Dashboard (IIS)
         run: |
-          ls ${{ github.workspace }}
+          xcopy "${{ github.workspace }}" "C:\inetpub\wwwroot\new-dashboard\new-dashboard-frontend" /MIR /XD .git .github node_modules
 
-  deploy-prod:
-    needs: setup
-    if: github.ref_name == 'master'
-    steps:
-      - name: Copy to FMM Finance Dashboard (master branch)
-        if: github.ref_name == 'master'
-        run: |
-          xcopy "${{ github.workspace }}" "C:\inetpub\wwwroot\new-dashboard\new-dashboard-frontend" /E /H /C /I /Y
-
-      - run: echo "🍏 This job's status is ${{ job.status }}."
+      - run: echo "🍏 Deployment status is ${{ job.status }}."
