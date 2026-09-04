@@ -18,6 +18,8 @@ export default function Page() {
   const {
     data,
     loading,
+    isAnyLoading,
+    sectionLoading,
     error,
     mounted,
     startDate,
@@ -96,7 +98,7 @@ export default function Page() {
           group={group}
           setGroup={setGroup}
           groupList={groupList}
-          loading={loading}
+          loading={isAnyLoading}
           mounted={mounted}
           onRefresh={refetch}
         />
@@ -112,7 +114,7 @@ export default function Page() {
         {/* Top 4 KPI Metrics Cards */}
         <KpiCardsSection
           data={data}
-          loading={loading}
+          loading={sectionLoading.summary}
           branch={branch}
           group={group}
           customer={customer}
@@ -122,7 +124,7 @@ export default function Page() {
         {/* Unpaid Invoices Amount by Customer (Top 10 Chart Card) */}
         <UnpaidAmountByCustomerCard
           data={data}
-          loading={loading}
+          loading={sectionLoading.summary}
           branch={branch}
           group={group}
           customer={customer}
@@ -134,7 +136,7 @@ export default function Page() {
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
           <SummaryCustomersCard
             data={data}
-            loading={loading}
+            loading={sectionLoading.summary}
             branch={branch}
             group={group}
             customer={customer}
@@ -143,7 +145,7 @@ export default function Page() {
           />
           <UnpaidInvoicesCard
             data={data}
-            loading={loading}
+            loading={sectionLoading.summary}
             branch={branch}
             group={group}
             customer={customer}
@@ -156,7 +158,7 @@ export default function Page() {
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
           <PaidInvoicesCard
             data={data}
-            loading={loading}
+            loading={sectionLoading.paidSummary}
             branch={branch}
             group={group}
             customer={customer}
@@ -165,7 +167,7 @@ export default function Page() {
           />
           <PaidInvoicesDonutCard
             data={data}
-            loading={loading}
+            loading={sectionLoading.paidSummary}
             branch={branch}
             group={group}
             customer={customer}
@@ -177,7 +179,7 @@ export default function Page() {
         {/* Paid vs Unpaid Monthly Bar Chart */}
         <PaidVsUnpaidChartCard
           data={data}
-          loading={loading}
+          loading={sectionLoading.paidVsUnpaid}
           branch={branch}
           group={group}
           customer={customer}
@@ -187,7 +189,7 @@ export default function Page() {
         {/* Customer Invoices Full Datatable */}
         <CustomerInvoicesCard
           data={data}
-          loading={loading}
+          loading={sectionLoading.customerInvoices}
           customer={customer}
           category={category}
         />
@@ -195,7 +197,7 @@ export default function Page() {
         {/* UMC This Month Datatable */}
         <UmcThisMonthCard
           data={data}
-          loading={loading}
+          loading={sectionLoading.umc}
           customer={customer}
           category={category}
         />
