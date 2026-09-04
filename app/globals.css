@@ -73,7 +73,7 @@
     --theme-header-to: #32363D;
 
     /* Base Colors - Soft Pastel Minimalist */
-    --background: #FAF9F6;
+    --background: #EAE5DC;
     --foreground: #22262E;
     --card: #FFFFFF;
     --card-foreground: #22262E;
@@ -173,10 +173,30 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground font-mono antialiased;
+    @apply text-foreground font-mono antialiased;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   }
   html {
     @apply font-mono;
   }
+}
+
+.bg-pattern-canvas {
+  background-color: #E7E2D8;
+  background-image: 
+    linear-gradient(to right, rgba(85, 140, 120, 0.13) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(85, 140, 120, 0.13) 1px, transparent 1px),
+    linear-gradient(to right, rgba(210, 115, 90, 0.18) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(210, 115, 90, 0.18) 1px, transparent 1px);
+  background-size: 24px 24px, 24px 24px, 96px 96px, 96px 96px;
+}
+
+.dark .bg-pattern-canvas {
+  background-color: #12151A;
+  background-image: 
+    linear-gradient(to right, rgba(100, 166, 143, 0.08) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(100, 166, 143, 0.08) 1px, transparent 1px),
+    linear-gradient(to right, rgba(218, 127, 108, 0.14) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(218, 127, 108, 0.14) 1px, transparent 1px);
+  background-size: 24px 24px, 24px 24px, 96px 96px, 96px 96px;
 }

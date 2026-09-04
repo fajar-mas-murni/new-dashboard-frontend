@@ -36,8 +36,19 @@ export default function Page() {
     refetch,
   } = useArData();
 
+  const gridPatternStyle: React.CSSProperties = {
+    backgroundColor: "#E7E2D8",
+    backgroundImage: `
+      linear-gradient(to right, rgba(85, 140, 120, 0.13) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(85, 140, 120, 0.13) 1px, transparent 1px),
+      linear-gradient(to right, rgba(210, 115, 90, 0.18) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(210, 115, 90, 0.18) 1px, transparent 1px)
+    `,
+    backgroundSize: "24px 24px, 24px 24px, 96px 96px, 96px 96px",
+  };
+
   return (
-    <div className="min-h-screen bg-background text-foreground font-mono antialiased transition-colors duration-300">
+    <div style={gridPatternStyle} className="min-h-screen text-foreground font-mono antialiased transition-colors duration-300">
       {/* Global Top Navbar - Minimalist Frosted Header */}
       <header className="sticky top-0 z-40 w-full border-b border-border/70 bg-card/85 backdrop-blur-md px-6 py-3 transition-colors">
         <div className="max-w-7xl mx-auto flex items-center justify-between gap-6">
@@ -65,11 +76,6 @@ export default function Page() {
                 Account Payable
               </button>
             </nav>
-          </div>
-
-          <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
-            <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-            <span className="hidden sm:inline">Live Mode</span>
           </div>
         </div>
       </header>
