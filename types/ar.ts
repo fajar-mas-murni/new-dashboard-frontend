@@ -85,4 +85,4 @@ export interface ArSummaryResponse {
   "all-umc-this-month": UmcItem[];
 }
 
-export type FilterCategory = "all" | "anak-usaha" | "non-anak-usaha";
+export type FilterCategory = "all" | "anak-usaha" | "non-anak-usaha" | "anak_usaha" | "non_anak_usaha";

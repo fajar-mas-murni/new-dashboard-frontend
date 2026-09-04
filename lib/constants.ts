@@ -7,10 +7,17 @@ export const ANAK_USAHA_COMPANIES = [
   "PT Fajar Rawayan Utama",
 ];
 
+export const ANAK_USAHA_KEYWORDS = [
+  "mitra atlas nusantara",
+  "fajar bumi harmoni",
+  "fajar mitra harmoni",
+  "fajar rawayan utama",
+];
+
 export const CATEGORY_OPTIONS: { value: FilterCategory; label: string }[] = [
-  { value: "all", label: "All Customers" },
-  { value: "anak-usaha", label: "Anak Usaha" },
-  { value: "non-anak-usaha", label: "Non Anak Usaha" },
+  { value: "all", label: "All Categories" },
+  { value: "anak_usaha", label: "Anak Usaha" },
+  { value: "non_anak_usaha", label: "Non Anak Usaha" },
 ];
 
 export const DEFAULT_START_DATE = "2024-01-01";

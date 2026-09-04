@@ -1,4 +1,4 @@
-import { ANAK_USAHA_COMPANIES } from "./constants";
+import { ANAK_USAHA_COMPANIES, ANAK_USAHA_KEYWORDS } from "./constants";
 import { FilterCategory } from "@/types/ar";
 
 export const formatAmount = (val: number | undefined | null): string => {
@@ -50,17 +50,18 @@ export const formatPeriod = (periodStr: string | undefined | null): string => {
   return periodStr;
 };
 
-export const isCustomerInCategory = (custName: string | undefined | null, category: FilterCategory): boolean => {
-  if (category === "all") return true;
+export const isCustomerInCategory = (custName: string | undefined | null, category: FilterCategory | string): boolean => {
+  if (!category || category === "all") return true;
   if (!custName) return false;
 
-  const cleanName = custName.trim().toLowerCase();
-  const isAnakUsaha = ANAK_USAHA_COMPANIES.some(comp =>
-    cleanName.includes(comp.toLowerCase()) || comp.toLowerCase().includes(cleanName)
-  );
+  const cleanName = custName.toLowerCase().replace(/[^a-z0-9]/g, " ");
+  const isAnakUsaha = (ANAK_USAHA_KEYWORDS || []).some(keyword => {
+    const cleanKeyword = keyword.toLowerCase().replace(/[^a-z0-9]/g, " ");
+    return cleanName.includes(cleanKeyword);
+  });
 
-  if (category === "anak-usaha") return isAnakUsaha;
-  if (category === "non-anak-usaha") return !isAnakUsaha;
+  if (category === "anak-usaha" || category === "anak_usaha") return isAnakUsaha;
+  if (category === "non-anak-usaha" || category === "non_anak_usaha") return !isAnakUsaha;
   return true;
 };
 

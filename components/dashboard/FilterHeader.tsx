@@ -216,7 +216,7 @@ export function FilterHeader({
                     { value: "non_anak_usaha", label: "Non Anak Usaha" },
                   ]}
                   placeholder="Select category"
-                  allLabel="All Customers"
+                  allLabel="All Categories"
                   className="w-full"
                   icon={<Users className="w-3.5 h-3.5 text-muted-foreground" />}
                 />
