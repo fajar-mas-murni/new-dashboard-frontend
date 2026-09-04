@@ -92,24 +92,24 @@ export function UnpaidAmountByCustomerCard({
   if (filteredTop10.length === 0) return null;
 
   return (
-    <Card className="bg-white/95 dark:bg-slate-900/95 rounded-2xl border border-gray-200/80 dark:border-slate-800/40 shadow-sm overflow-hidden relative transition-colors duration-300">
-      <CardHeader className="p-6 flex flex-row items-center gap-2.5">
-        <CardTitle className="text-xl font-bold flex items-center gap-2.5">
-          <BarChart3 className="w-5.5 h-5.5 text-theme-orange" />
-          <span className="flex items-center flex-wrap gap-x-1">
-            Unpaid invoices amount by customer (Top 10){" "}
-            <span className="text-sm font-normal italic text-slate-500 tracking-normal">
-              in home currency
-            </span>
+    <Card className="bg-card rounded-2xl border border-border/80 shadow-xs overflow-hidden relative transition-colors duration-300">
+      <CardHeader className="px-6 py-4 flex flex-row items-center gap-3">
+        <div className="w-8 h-8 rounded-lg bg-[#FDE8DF] dark:bg-[#361E17] text-[#D86A46] dark:text-[#FDBA74] border border-[#F8D2C3] dark:border-[#572B20] flex items-center justify-center flex-shrink-0">
+          <BarChart3 className="w-4 h-4" />
+        </div>
+        <CardTitle className="text-base font-bold text-foreground flex items-center flex-wrap gap-x-2">
+          <span>Unpaid Invoices by Customer (Top 10)</span>
+          <span className="text-xs font-normal text-muted-foreground tracking-normal">
+            home currency
           </span>
         </CardTitle>
       </CardHeader>
       <Separator />
-      <CardContent>
-        <div className="flex flex-col lg:flex-row gap-8 items-stretch p-2 sm:p-6">
+      <CardContent className="p-6">
+        <div className="flex flex-col lg:flex-row gap-8 items-stretch">
           {/* Left Column: Horizontal Bar Chart */}
-          <div className="flex-1 flex flex-col justify-between pr-0 lg:pr-8 pb-6 lg:pb-0">
-            <div className="space-y-3.5">
+          <div className="flex-1 flex flex-col justify-between pr-0 lg:pr-6 pb-6 lg:pb-0">
+            <div className="space-y-3">
               {filteredTop10.map((item, idx) => {
                 const maxVal = filteredTop10[0]?.amount || 1;
                 const pct = (item.amount / maxVal) * 100;
@@ -119,24 +119,25 @@ export function UnpaidAmountByCustomerCard({
                   <div
                     key={idx}
                     onClick={() => setCustomer(customer === item.customer ? "all" : item.customer)}
-                    className={`flex items-center gap-3 cursor-pointer group transition-all duration-300 ${isMuted ? "opacity-30 scale-[0.98]" : "opacity-100"
-                      }`}
+                    className={`flex items-center gap-3 cursor-pointer group transition-all duration-200 ${
+                      isMuted ? "opacity-30 scale-[0.99]" : "opacity-100"
+                    }`}
                   >
                     <div
-                      className="w-28 text-right text-xs font-semibold text-slate-600 dark:text-slate-300 truncate group-hover:text-theme-orange transition-colors"
+                      className="w-32 text-right text-xs font-medium text-muted-foreground truncate group-hover:text-foreground transition-colors"
                       title={item.customer}
                     >
                       {item.customer}
                     </div>
-                    <div className="flex-1 h-5.5 bg-slate-100 dark:bg-slate-800/50 rounded-md overflow-hidden relative flex items-center shadow-inner">
+                    <div className="flex-1 h-5.5 bg-secondary/70 dark:bg-secondary/40 rounded-lg overflow-hidden relative flex items-center">
                       <div
                         style={{
                           width: `${pct}%`,
                           backgroundColor: `var(--chart-${(idx % 10) + 1})`,
                         }}
-                        className="h-full rounded-r-md transition-all duration-500 group-hover:brightness-110 shadow-sm"
+                        className="h-full rounded-lg transition-all duration-500 group-hover:brightness-105"
                       ></div>
-                      <span className="absolute left-2.5 text-[9px] font-bold text-white drop-shadow-sm">
+                      <span className="absolute left-2.5 text-[10px] font-bold text-foreground/80 tabular-nums">
                         {new Intl.NumberFormat("id-ID").format(item.amount)}
                       </span>
                     </div>
@@ -147,18 +148,18 @@ export function UnpaidAmountByCustomerCard({
           </div>
 
           {/* Right Column: Donut Chart & Legend */}
-          <div className="w-full lg:w-[540px] flex flex-row items-center justify-center gap-10 pl-0 lg:pl-8">
+          <div className="w-full lg:w-[500px] flex flex-col sm:flex-row items-center justify-center gap-8 pl-0 lg:pl-6 border-t lg:border-t-0 lg:border-l border-border/60 pt-6 lg:pt-0">
             {(() => {
               const totalUnpaidTop10 = filteredTop10.reduce((sum, item) => sum + item.amount, 0) || 1;
-              const radius = 75;
+              const radius = 72;
               const circumference = 2 * Math.PI * radius;
               let accumulatedAngle = 0;
 
               return (
                 <>
                   {/* SVG Donut Chart */}
-                  <div className="relative w-[200px] h-[200px] flex-shrink-0 flex items-center justify-center">
-                    <svg width="200" height="200" viewBox="0 0 200 200" className="transform -rotate-90">
+                  <div className="relative w-[180px] h-[180px] flex-shrink-0 flex items-center justify-center">
+                    <svg width="180" height="180" viewBox="0 0 200 200" className="transform -rotate-90">
                       {filteredTop10.map((item, idx) => {
                         const p = item.amount / totalUnpaidTop10;
                         const strokeOffset = circumference - p * circumference;
@@ -181,25 +182,26 @@ export function UnpaidAmountByCustomerCard({
                             strokeDashoffset={strokeOffset}
                             transform={`rotate(${angle} 100 100)`}
                             strokeLinecap="round"
-                            className={`transition-all duration-300 cursor-pointer ${isMuted ? "opacity-30" : "opacity-100"
-                              }`}
+                            className={`transition-all duration-300 cursor-pointer ${
+                              isMuted ? "opacity-25" : "opacity-100"
+                            }`}
                             onClick={() => setCustomer(customer === item.customer ? "all" : item.customer)}
                           />
                         );
                       })}
                     </svg>
                     <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                      <span className="text-[13px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">
+                      <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
                         Top 10
                       </span>
-                      <span className="text-2xl font-black text-slate-700 dark:text-slate-200 mt-0.5">
+                      <span className="text-xl font-extrabold text-foreground mt-0.5">
                         AR
                       </span>
                     </div>
                   </div>
 
                   {/* Legend List */}
-                  <div className="flex-1 space-y-2 max-h-[250px] overflow-y-auto pr-1 select-none">
+                  <div className="flex-1 space-y-1.5 max-h-[220px] overflow-y-auto pr-1 select-none w-full">
                     {filteredTop10.map((item, idx) => {
                       const p = (item.amount / totalUnpaidTop10) * 100;
                       const isSelected = customer === item.customer;
@@ -210,17 +212,18 @@ export function UnpaidAmountByCustomerCard({
                         <div
                           key={idx}
                           onClick={() => setCustomer(customer === item.customer ? "all" : item.customer)}
-                          className={`flex items-center gap-2.5 text-xs font-semibold transition-all cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/30 p-1.5 rounded-md ${isMuted ? "opacity-35" : "opacity-100"
-                            } ${isSelected ? "bg-slate-100/80 dark:bg-slate-800/50" : ""}`}
+                          className={`flex items-center gap-2 text-xs transition-all cursor-pointer hover:bg-secondary/80 p-1.5 rounded-lg ${
+                            isMuted ? "opacity-30" : "opacity-100"
+                          } ${isSelected ? "bg-secondary font-semibold" : "text-muted-foreground hover:text-foreground"}`}
                         >
                           <span
                             style={{ backgroundColor: `var(--chart-${(idx % 10) + 1})` }}
-                            className="w-3 h-3 rounded-full flex-shrink-0 border border-white/20"
+                            className="w-2.5 h-2.5 rounded-full flex-shrink-0"
                           ></span>
-                          <span className="text-slate-700 dark:text-slate-300 truncate flex-1" title={item.customer}>
+                          <span className="truncate flex-1" title={item.customer}>
                             {item.customer}
                           </span>
-                          <span className="text-slate-500 dark:text-slate-400 pl-1">{p.toFixed(1)}%</span>
+                          <span className="tabular-nums text-[11px] font-medium pl-1 text-foreground/70">{p.toFixed(1)}%</span>
                         </div>
                       );
                     })}

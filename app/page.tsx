@@ -37,25 +37,40 @@ export default function Page() {
   } = useArData();
 
   return (
-    <div className="min-h-screen bg-background text-foreground font-sans antialiased transition-colors duration-300">
-      {/* Global Top Navbar */}
-      <header className="w-full bg-gradient-to-r from-theme-black via-theme-header-via to-theme-header-to text-white shadow-md border-b border-slate-850 relative overflow-hidden py-3 px-6 z-30">
-        <div className="max-w-7xl mx-auto flex items-center justify-between md:justify-start gap-8">
-          <h1 className="text-sm font-bold tracking-tight z-10 flex items-center gap-2">
-            <span className="w-2 h-2 bg-theme-orange rounded-full animate-pulse"></span>
-            New Dashboard
-          </h1>
-          <nav className="flex items-center gap-4 sm:gap-6 z-10">
-            <button className="text-xs font-semibold text-white cursor-pointer relative py-1.5 after:absolute after:-bottom-3.5 after:left-0 after:right-0 after:h-0.5 after:bg-theme-orange">
-              Account Receivable
-            </button>
-            <button className="text-xs font-medium text-slate-300 hover:text-white transition-colors cursor-pointer py-1.5">
-              Revenue
-            </button>
-            <button className="text-xs font-medium text-slate-300 hover:text-white transition-colors cursor-pointer py-1.5">
-              Account Payable
-            </button>
-          </nav>
+    <div className="min-h-screen bg-background text-foreground font-mono antialiased transition-colors duration-300">
+      {/* Global Top Navbar - Minimalist Frosted Header */}
+      <header className="sticky top-0 z-40 w-full border-b border-border/70 bg-card/85 backdrop-blur-md px-6 py-3 transition-colors">
+        <div className="max-w-7xl mx-auto flex items-center justify-between gap-6">
+          <div className="flex items-center gap-6 sm:gap-8">
+            <div className="flex items-center gap-2.5">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary/60 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+              </span>
+              <span className="text-xs font-bold tracking-tight text-foreground uppercase">
+                Dashboard
+              </span>
+              <span className="hidden sm:inline-flex items-center text-[10px] uppercase font-semibold px-1.5 py-0.5 rounded bg-muted text-muted-foreground border border-border/60">
+                Finance
+              </span>
+            </div>
+            <nav className="flex items-center gap-1.5">
+              <button className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-secondary text-secondary-foreground border border-border/60 shadow-xs cursor-pointer">
+                Account Receivable
+              </button>
+              <button className="text-xs font-medium px-3 py-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors cursor-pointer">
+                Revenue
+              </button>
+              <button className="text-xs font-medium px-3 py-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors cursor-pointer">
+                Account Payable
+              </button>
+            </nav>
+          </div>
+
+          <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
+            <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+            <span className="hidden sm:inline">Live Mode</span>
+          </div>
         </div>
       </header>
 

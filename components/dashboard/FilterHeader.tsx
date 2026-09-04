@@ -105,33 +105,64 @@ export function FilterHeader({
     endDate !== getDefaultEndDate();
 
   return (
-    <div className="bg-gradient-to-r from-theme-black via-theme-header-via to-theme-header-to text-white rounded-2xl px-6 py-4 flex flex-col lg:flex-row lg:items-center justify-between shadow-md border border-theme-orange/20 relative overflow-hidden gap-4">
-      <div className="absolute top-0 right-0 w-64 h-64 bg-theme-yellow/5 rounded-full blur-3xl pointer-events-none -mr-20 -mt-20"></div>
+    <div className="bg-card text-foreground rounded-2xl p-5 border border-border/80 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4 transition-colors">
+      <div className="flex flex-col gap-1.5 z-10">
+        <div className="flex items-center gap-2.5 flex-wrap">
+          <h2 className="text-base sm:text-lg font-bold tracking-tight text-foreground whitespace-nowrap">
+            Accounts Receivable
+          </h2>
+          <span className="text-[11px] text-muted-foreground font-medium px-2 py-0.5 rounded-md bg-secondary/70 border border-border/60">
+            {formatDisplayDate(startDate)} — {formatDisplayDate(endDate)}
+          </span>
+        </div>
 
-      <h2 className="text-base sm:text-lg font-bold tracking-tight z-10 whitespace-nowrap">
-        Accounts Receivable dashboard
-      </h2>
+        {/* Minimalist Active Filter Badges */}
+        {hasActiveFilters && (
+          <div className="flex items-center gap-1.5 flex-wrap pt-0.5">
+            {branch !== "all" && (
+              <span className="text-[10px] font-medium px-2 py-0.5 rounded-md bg-[#E3EDF7] dark:bg-[#1E293B] text-[#2B6CB0] dark:text-[#93C5FD] border border-[#CBDCEE] dark:border-[#334155]">
+                Branch: {branchLabel}
+              </span>
+            )}
+            {group !== "all" && (
+              <span className="text-[10px] font-medium px-2 py-0.5 rounded-md bg-[#EAE9F8] dark:bg-[#2A2640] text-[#5B56A0] dark:text-[#C4B5FD] border border-[#D5D3F2] dark:border-[#4338CA]/40">
+                Group: {groupLabel}
+              </span>
+            )}
+            {category !== "all" && (
+              <span className="text-[10px] font-medium px-2 py-0.5 rounded-md bg-[#FEF3D6] dark:bg-[#2E2818] text-[#B47818] dark:text-[#FDE68A] border border-[#F6E3B0] dark:border-[#785412]/40">
+                Cat: {categoryLabel}
+              </span>
+            )}
+            {customer !== "all" && (
+              <span className="text-[10px] font-medium px-2 py-0.5 rounded-md bg-[#FCE7EC] dark:bg-[#331C24] text-[#C84C6F] dark:text-[#F9A8D4] border border-[#F7CBD6] dark:border-[#9D174D]/40">
+                Customer: {customerLabel}
+              </span>
+            )}
+          </div>
+        )}
+      </div>
 
       {/* Action Buttons */}
-      <div className="flex items-center gap-3 z-10">
+      <div className="flex items-center gap-2.5 z-10 self-start md:self-auto">
         <Dialog>
-          <DialogTrigger className="flex items-center gap-2 px-4 py-2 bg-[#f0f2f5] dark:bg-slate-800 hover:bg-gray-200 dark:hover:bg-slate-700 border border-gray-300/80 dark:border-slate-700 hover:border-theme-orange/20 hover:text-theme-orange text-gray-700 dark:text-slate-200 font-semibold rounded-xl text-xs transition-colors h-9 cursor-pointer">
-            <Filter className="w-4 h-4" />
-            Filters
+          <DialogTrigger className="flex items-center gap-2 px-3.5 py-2 bg-secondary/80 hover:bg-secondary text-secondary-foreground border border-border/80 hover:border-primary/40 rounded-xl text-xs font-semibold transition-all shadow-2xs h-9 cursor-pointer">
+            <Filter className="w-3.5 h-3.5 text-muted-foreground" />
+            <span>Filters</span>
             {hasActiveFilters && (
-              <span className="flex items-center justify-center bg-theme-orange text-white w-4 h-4 rounded-full text-[9px] font-bold">
+              <span className="flex items-center justify-center bg-primary text-white w-4 h-4 rounded-full text-[9px] font-bold">
                 !
               </span>
             )}
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[425px] bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-2xl shadow-xl z-[60]">
+          <DialogContent className="sm:max-w-[425px] bg-card border border-border rounded-2xl shadow-xl z-[60]">
             <DialogHeader>
-              <DialogTitle className="text-lg font-bold text-slate-800 dark:text-slate-100">Filter Data</DialogTitle>
+              <DialogTitle className="text-base font-bold text-foreground">Filter Data</DialogTitle>
             </DialogHeader>
-            <div className="flex flex-col gap-5 py-4">
+            <div className="flex flex-col gap-4 py-3">
               {/* Branch Filter */}
               <div className="flex flex-col gap-1.5">
-                <label className="text-xs text-slate-500 dark:text-slate-400 font-medium">Branch:</label>
+                <label className="text-xs text-muted-foreground font-medium">Branch:</label>
                 <SearchableSelect
                   value={branch}
                   selectedLabel={branchLabel}
@@ -145,13 +176,13 @@ export function FilterHeader({
                   allLabel="All Branches"
                   pageSize={10}
                   className="w-full"
-                  icon={<Building2 className="w-4 h-4" />}
+                  icon={<Building2 className="w-3.5 h-3.5 text-muted-foreground" />}
                 />
               </div>
 
               {/* Group Filter */}
               <div className="flex flex-col gap-1.5">
-                <label className="text-xs text-slate-500 dark:text-slate-400 font-medium">Group:</label>
+                <label className="text-xs text-muted-foreground font-medium">Group:</label>
                 <SearchableSelect
                   value={group}
                   selectedLabel={groupLabel}
@@ -164,13 +195,13 @@ export function FilterHeader({
                   allLabel="All Groups"
                   pageSize={10}
                   className="w-full"
-                  icon={<Layers className="w-4 h-4" />}
+                  icon={<Layers className="w-3.5 h-3.5 text-muted-foreground" />}
                 />
               </div>
 
               {/* Category Filter */}
               <div className="flex flex-col gap-1.5">
-                <label className="text-xs text-slate-500 dark:text-slate-400 font-medium">Category:</label>
+                <label className="text-xs text-muted-foreground font-medium">Category:</label>
                 <SearchableSelect
                   value={category}
                   selectedLabel={categoryLabel}
@@ -187,13 +218,13 @@ export function FilterHeader({
                   placeholder="Select category"
                   allLabel="All Customers"
                   className="w-full"
-                  icon={<Users className="w-4 h-4" />}
+                  icon={<Users className="w-3.5 h-3.5 text-muted-foreground" />}
                 />
               </div>
 
               {/* Customer Filter */}
               <div className="flex flex-col gap-1.5">
-                <label className="text-xs text-slate-500 dark:text-slate-400 font-medium">Customer:</label>
+                <label className="text-xs text-muted-foreground font-medium">Customer:</label>
                 <SearchableSelect
                   value={customer}
                   selectedLabel={customerLabel}
@@ -207,19 +238,19 @@ export function FilterHeader({
                   allLabel="All Customers"
                   pageSize={10}
                   className="w-full"
-                  icon={<Users className="w-4 h-4" />}
+                  icon={<Users className="w-3.5 h-3.5 text-muted-foreground" />}
                 />
               </div>
 
               {/* Start Date Picker */}
               <div className="flex flex-col gap-1.5">
-                <label className="text-xs text-slate-500 dark:text-slate-400 font-medium">Start Date:</label>
+                <label className="text-xs text-muted-foreground font-medium">Start Date:</label>
                 <Popover>
-                  <PopoverTrigger className="w-full flex flex-row items-center justify-start text-left font-semibold bg-[#f0f2f5] dark:bg-slate-800 border border-gray-300/80 dark:border-slate-700 hover:bg-gray-250 dark:hover:bg-slate-700 text-xs rounded-xl px-3 py-2 cursor-pointer text-[#2d2e30] dark:text-slate-100 h-9 transition-colors ring-0 outline-none">
-                    <Calendar className="mr-2 h-4 w-4 text-gray-500 dark:text-slate-400" />
+                  <PopoverTrigger className="w-full flex flex-row items-center justify-start text-left font-medium bg-secondary/60 hover:bg-secondary/90 border border-border text-xs rounded-xl px-3 py-2 cursor-pointer text-foreground h-9 transition-colors ring-0 outline-none">
+                    <Calendar className="mr-2 h-3.5 w-3.5 text-muted-foreground" />
                     {formatDisplayDate(startDate)}
                   </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0 border border-gray-200 dark:border-slate-800 shadow-xl rounded-2xl bg-white dark:bg-slate-900 z-[100]">
+                  <PopoverContent className="w-auto p-0 border border-border shadow-xl rounded-2xl bg-card z-[100]">
                     <ShadcnCalendar
                       mode="single"
                       defaultMonth={fromDateString(startDate)}
@@ -235,13 +266,13 @@ export function FilterHeader({
 
               {/* End Date Picker */}
               <div className="flex flex-col gap-1.5">
-                <label className="text-xs text-slate-500 dark:text-slate-400 font-medium">End Date:</label>
+                <label className="text-xs text-muted-foreground font-medium">End Date:</label>
                 <Popover>
-                  <PopoverTrigger className="w-full flex flex-row items-center justify-start text-left font-semibold bg-[#f0f2f5] dark:bg-slate-800 border border-gray-300/80 dark:border-slate-700 hover:bg-gray-250 dark:hover:bg-slate-700 text-xs rounded-xl px-3 py-2 cursor-pointer text-[#2d2e30] dark:text-slate-100 h-9 transition-colors ring-0 outline-none">
-                    <Calendar className="mr-2 h-4 w-4 text-gray-500 dark:text-slate-400" />
+                  <PopoverTrigger className="w-full flex flex-row items-center justify-start text-left font-medium bg-secondary/60 hover:bg-secondary/90 border border-border text-xs rounded-xl px-3 py-2 cursor-pointer text-foreground h-9 transition-colors ring-0 outline-none">
+                    <Calendar className="mr-2 h-3.5 w-3.5 text-muted-foreground" />
                     {formatDisplayDate(endDate)}
                   </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0 border border-gray-200 dark:border-slate-800 shadow-xl rounded-2xl bg-white dark:bg-slate-900 z-[100]">
+                  <PopoverContent className="w-auto p-0 border border-border shadow-xl rounded-2xl bg-card z-[100]">
                     <ShadcnCalendar
                       mode="single"
                       defaultMonth={fromDateString(endDate)}
@@ -254,7 +285,7 @@ export function FilterHeader({
                 </Popover>
               </div>
             </div>
-            <DialogFooter className="flex items-center justify-between sm:justify-between w-full border-t border-gray-100 dark:border-slate-800 pt-4 mt-2">
+            <DialogFooter className="flex items-center justify-between sm:justify-between w-full border-t border-border pt-4 mt-2">
               <button
                 onClick={() => {
                   setStartDate(getDefaultStartDate());
@@ -268,7 +299,7 @@ export function FilterHeader({
                   setGroup("all");
                   setGroupLabel("All Groups");
                 }}
-                className="text-xs text-slate-500 hover:text-theme-orange font-semibold cursor-pointer transition-colors"
+                className="text-xs text-muted-foreground hover:text-primary font-semibold cursor-pointer transition-colors"
               >
                 Reset Filters
               </button>
@@ -279,10 +310,10 @@ export function FilterHeader({
           onClick={onRefresh}
           disabled={mounted ? loading : false}
           suppressHydrationWarning
-          className="p-2.5 bg-[#f0f2f5] dark:bg-slate-800 hover:bg-gray-200 dark:hover:bg-slate-700 rounded-xl border border-gray-300/80 dark:border-slate-700 hover:border-theme-orange/20 hover:text-theme-orange transition-colors cursor-pointer h-9 w-9 flex items-center justify-center text-gray-600 dark:text-gray-300"
+          className="p-2 bg-secondary/80 hover:bg-secondary text-secondary-foreground rounded-xl border border-border/80 hover:border-primary/40 transition-all cursor-pointer h-9 w-9 flex items-center justify-center shadow-2xs"
           title="Refresh Data"
         >
-          <RefreshCw className={`w-3.5 h-3.5 ${mounted && loading ? "animate-spin" : ""}`} />
+          <RefreshCw className={`w-3.5 h-3.5 ${mounted && loading ? "animate-spin text-primary" : ""}`} />
         </button>
       </div>
     </div>

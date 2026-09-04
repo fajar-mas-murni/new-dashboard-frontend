@@ -27,28 +27,28 @@ export function PaidInvoicesDonutCard({
   setCustomer,
 }: PaidInvoicesDonutCardProps) {
   return (
-    <Card className="bg-white/95 dark:bg-slate-900/95 rounded-2xl border border-gray-200/80 dark:border-slate-800/40 shadow-sm overflow-hidden flex flex-col h-[500px]">
+    <Card className="bg-card rounded-2xl border border-border/80 shadow-xs overflow-hidden flex flex-col h-[500px] transition-colors">
       <CardHeader className="px-5 py-3.5 flex flex-row items-center gap-2.5 flex-shrink-0">
-        <Receipt className="w-5 h-5 text-theme-orange" />
-        <CardTitle className="text-lg font-bold text-slate-800 dark:text-white flex items-center flex-wrap gap-x-1">
-          Last 12 month paid invoices amount{" "}
-          <span className="text-sm font-normal italic text-slate-500 tracking-normal">
-            in home currency
-          </span>
+        <div className="w-8 h-8 rounded-lg bg-[#E3EDF7] dark:bg-[#1E293B] text-[#2B6CB0] dark:text-[#93C5FD] border border-[#CBDCEE] dark:border-[#334155] flex items-center justify-center flex-shrink-0">
+          <Receipt className="w-4 h-4" />
+        </div>
+        <CardTitle className="text-base font-bold text-foreground flex items-center flex-wrap gap-x-2">
+          <span>Paid Invoices (Last 12 Months)</span>
+          <span className="text-xs font-normal text-muted-foreground tracking-normal">home currency</span>
         </CardTitle>
       </CardHeader>
       <Separator />
       <CardContent className="p-0 flex-1 flex items-center justify-center">
         {loading ? (
           <div className="flex flex-row items-center justify-center gap-10 p-6 animate-pulse w-full">
-            <div className="w-[180px] h-[180px] rounded-full border-[18px] border-slate-200 dark:border-slate-800 flex items-center justify-center">
-              <div className="h-5 w-16 bg-slate-200 dark:bg-slate-800 rounded"></div>
+            <div className="w-[180px] h-[180px] rounded-full border-[18px] border-muted flex items-center justify-center">
+              <div className="h-5 w-16 bg-muted rounded"></div>
             </div>
             <div className="flex-1 space-y-3">
               {Array.from({ length: 6 }).map((_, i) => (
                 <div key={i} className="flex items-center gap-2.5 h-6">
-                  <div className="w-3 h-3 bg-slate-200 dark:bg-slate-800 rounded-full"></div>
-                  <div className="h-4 bg-slate-200 dark:bg-slate-800 rounded-md flex-1"></div>
+                  <div className="w-3 h-3 bg-muted rounded-full"></div>
+                  <div className="h-4 bg-muted rounded-md flex-1"></div>
                 </div>
               ))}
             </div>
@@ -83,7 +83,7 @@ export function PaidInvoicesDonutCard({
 
           if (groupedPaid.length === 0) {
             return (
-              <div className="text-center py-12 text-slate-400 dark:text-slate-500 font-medium">
+              <div className="text-center py-12 text-muted-foreground font-medium">
                 No data found
               </div>
             );
@@ -132,12 +132,12 @@ export function PaidInvoicesDonutCard({
                         r={radius}
                         fill="transparent"
                         stroke={`var(--chart-${(idx % 10) + 1})`}
-                        strokeWidth="18"
+                        strokeWidth={isSelected ? "22" : "18"}
                         strokeDasharray={circumference}
                         strokeDashoffset={strokeOffset}
                         transform={`rotate(${angle} 90 90)`}
                         className={`transition-all duration-300 ${
-                          isMuted ? "opacity-35" : "opacity-100 hover:stroke-[22px] cursor-pointer"
+                          isMuted ? "opacity-25" : "opacity-100 cursor-pointer"
                         }`}
                         onClick={() => {
                           if (item.customer !== "Lainnya") {
@@ -150,11 +150,11 @@ export function PaidInvoicesDonutCard({
                 </svg>
 
                 <div className="absolute inset-0 flex flex-col items-center justify-center bg-transparent pointer-events-none">
-                  <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">
+                  <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
                     Total Paid
                   </span>
                   <span
-                    className="text-[14px] sm:text-[15px] font-black text-slate-800 dark:text-white mt-0.5"
+                    className="text-base font-bold text-foreground mt-0.5 tabular-nums"
                     title={formatPaidAmount(totalPaidLast12)}
                   >
                     {totalPaidLast12 >= 1e9
@@ -167,7 +167,7 @@ export function PaidInvoicesDonutCard({
               </div>
 
               {/* Legend List */}
-              <div className="flex-1 space-y-1.5 max-h-[220px] overflow-auto pr-1">
+              <div className="flex-1 space-y-1.5 max-h-[220px] overflow-auto pr-1 select-none">
                 {donutData.map((item, idx) => {
                   const p = (item.last12Month / totalPaidLast12) * 100;
                   const isSelected = customer === item.customer;
@@ -182,18 +182,18 @@ export function PaidInvoicesDonutCard({
                           setCustomer(customer === item.customer ? "all" : item.customer);
                         }
                       }}
-                      className={`flex items-center gap-2.5 text-xs font-semibold transition-all cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/30 p-1.5 rounded-md ${
-                        isMuted ? "opacity-35" : "opacity-100"
-                      } ${isSelected ? "bg-slate-100/80 dark:bg-slate-800/50" : ""}`}
+                      className={`flex items-center gap-2 text-xs transition-all cursor-pointer hover:bg-secondary/80 p-1.5 rounded-lg ${
+                        isMuted ? "opacity-30" : "opacity-100"
+                      } ${isSelected ? "bg-secondary font-semibold" : "text-muted-foreground hover:text-foreground"}`}
                     >
                       <span
                         style={{ backgroundColor: `var(--chart-${(idx % 10) + 1})` }}
-                        className="w-2.5 h-2.5 rounded-full flex-shrink-0 border border-white/20"
+                        className="w-2.5 h-2.5 rounded-full flex-shrink-0"
                       ></span>
-                      <span className="text-slate-700 dark:text-slate-300 truncate flex-1" title={item.customer}>
+                      <span className="truncate flex-1" title={item.customer}>
                         {item.customer}
                       </span>
-                      <span className="text-slate-500 dark:text-slate-400 pl-1 text-[10px]">
+                      <span className="tabular-nums text-[11px] font-medium pl-1 text-foreground/70">
                         {p.toFixed(1)}%
                       </span>
                     </div>

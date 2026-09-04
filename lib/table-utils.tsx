@@ -49,20 +49,20 @@ export const renderSortableHeader = (
   return (
     <th
       onClick={() => onSort(colKey)}
-      className={`px-4 py-2.5 font-bold cursor-pointer hover:bg-white/10 transition-colors select-none group/th ${
+      className={`px-3.5 py-2.5 font-semibold text-[10px] uppercase tracking-wider cursor-pointer hover:bg-muted/80 text-muted-foreground hover:text-foreground transition-colors select-none group/th ${
         align === "right" ? "text-right" : "text-left"
       }`}
     >
-      <div className={`flex items-center gap-1 ${align === "right" ? "justify-end" : "justify-start"}`}>
+      <div className={`flex items-center gap-1.5 ${align === "right" ? "justify-end" : "justify-start"}`}>
         <span>{label}</span>
         {isSorted ? (
           currentDir === "asc" ? (
-            <ArrowUp className="w-3 h-3 text-theme-orange flex-shrink-0" />
+            <ArrowUp className="w-3 h-3 text-primary flex-shrink-0" />
           ) : (
-            <ArrowDown className="w-3 h-3 text-theme-orange flex-shrink-0" />
+            <ArrowDown className="w-3 h-3 text-primary flex-shrink-0" />
           )
         ) : (
-          <ArrowUpDown className="w-3 h-3 opacity-30 group-hover/th:opacity-100 flex-shrink-0 transition-opacity" />
+          <ArrowUpDown className="w-3 h-3 opacity-25 group-hover/th:opacity-75 flex-shrink-0 transition-opacity" />
         )}
       </div>
     </th>

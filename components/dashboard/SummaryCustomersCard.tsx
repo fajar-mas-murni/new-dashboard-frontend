@@ -77,19 +77,21 @@ export function SummaryCustomersCard({
   };
 
   return (
-    <Card className="bg-white/95 dark:bg-slate-900/95 rounded-2xl border border-gray-200/80 dark:border-slate-800/40 shadow-sm overflow-hidden flex flex-col h-[500px]">
-      <CardHeader className="px-5 py-4 flex flex-row items-center justify-between gap-2.5 flex-shrink-0">
+    <Card className="bg-card rounded-2xl border border-border/80 shadow-xs overflow-hidden flex flex-col h-[500px] transition-colors">
+      <CardHeader className="px-5 py-3.5 flex flex-row items-center justify-between gap-2.5 flex-shrink-0">
         <div className="flex items-center gap-2.5">
-          <FileSpreadsheet className="w-5 h-5 text-theme-orange" />
-          <CardTitle className="text-lg font-bold text-slate-800 dark:text-white flex items-center flex-wrap gap-x-1">
-            Summary Customers (Top 10){" "}
-            <span className="text-sm font-normal italic text-slate-500 tracking-normal">in home currency</span>
+          <div className="w-8 h-8 rounded-lg bg-[#E3EDF7] dark:bg-[#1E293B] text-[#2B6CB0] dark:text-[#93C5FD] border border-[#CBDCEE] dark:border-[#334155] flex items-center justify-center flex-shrink-0">
+            <FileSpreadsheet className="w-4 h-4" />
+          </div>
+          <CardTitle className="text-base font-bold text-foreground flex items-center flex-wrap gap-x-2">
+            <span>Summary Customers (Top 10)</span>
+            <span className="text-xs font-normal text-muted-foreground tracking-normal">home currency</span>
           </CardTitle>
         </div>
         <button
           onClick={() => exportToExcel(sortedSummary, "Summary_Customers", columnMapping)}
           disabled={loading || sortedSummary.length === 0}
-          className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-lg text-xs transition-colors cursor-pointer disabled:opacity-40"
+          className="flex items-center gap-1.5 px-3 py-1.5 bg-[#E3EFE9] hover:bg-[#D4E8DC] dark:bg-[#1C2C24] dark:hover:bg-[#23382D] text-[#246A4B] dark:text-[#86EFAC] border border-[#C5DFD2] dark:border-[#2D4D3D] font-medium rounded-lg text-xs transition-colors cursor-pointer disabled:opacity-40"
           title="Export to Excel"
         >
           <Download className="w-3.5 h-3.5" />
@@ -100,7 +102,7 @@ export function SummaryCustomersCard({
       <div className="overflow-auto flex-1">
         <table className="w-full text-left border-collapse whitespace-nowrap">
           <thead>
-            <tr className="bg-theme-brown text-white text-[10px] uppercase font-bold tracking-wider h-10 sticky top-0 z-10">
+            <tr className="bg-secondary/70 dark:bg-secondary/40 border-b border-border text-[10px] uppercase font-semibold tracking-wider h-9 sticky top-0 z-10 backdrop-blur-xs">
               {renderSortableHeader("Customer", "customer", summarySortCol, summarySortDir, (c) => handleToggleSort(c, summarySortCol, summarySortDir, setSummarySortCol, setSummarySortDir), "left")}
               {renderSortableHeader("Branch", "branch", summarySortCol, summarySortDir, (c) => handleToggleSort(c, summarySortCol, summarySortDir, setSummarySortCol, setSummarySortDir), "left")}
               {renderSortableHeader("Group", "group", summarySortCol, summarySortDir, (c) => handleToggleSort(c, summarySortCol, summarySortDir, setSummarySortCol, setSummarySortDir), "left")}
@@ -113,25 +115,25 @@ export function SummaryCustomersCard({
               {renderSortableHeader("Amount Due", "amountDue", summarySortCol, summarySortDir, (c) => handleToggleSort(c, summarySortCol, summarySortDir, setSummarySortCol, setSummarySortDir), "right")}
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-100 dark:divide-slate-800/50 text-xs">
+          <tbody className="divide-y divide-border/60 text-xs">
             {loading ? (
               Array.from({ length: 8 }).map((_, i) => (
-                <tr key={i} className="animate-pulse h-11">
-                  <td className="px-4 py-3"><div className="h-3 w-24 bg-slate-200 dark:bg-slate-800 rounded"></div></td>
-                  <td className="px-4 py-3"><div className="h-3 w-14 bg-slate-200 dark:bg-slate-800 rounded"></div></td>
-                  <td className="px-4 py-3"><div className="h-3 w-16 bg-slate-200 dark:bg-slate-800 rounded"></div></td>
-                  <td className="px-4 py-3"><div className="h-3 w-12 bg-slate-200 dark:bg-slate-800 rounded ml-auto"></div></td>
-                  <td className="px-4 py-3"><div className="h-3 w-12 bg-slate-200 dark:bg-slate-800 rounded ml-auto"></div></td>
-                  <td className="px-4 py-3"><div className="h-3 w-12 bg-slate-200 dark:bg-slate-800 rounded ml-auto"></div></td>
-                  <td className="px-4 py-3"><div className="h-3 w-12 bg-slate-200 dark:bg-slate-800 rounded ml-auto"></div></td>
-                  <td className="px-4 py-3"><div className="h-3 w-12 bg-slate-200 dark:bg-slate-800 rounded ml-auto"></div></td>
-                  <td className="px-4 py-3"><div className="h-3 w-12 bg-slate-200 dark:bg-slate-800 rounded ml-auto"></div></td>
-                  <td className="px-4 py-3"><div className="h-3 w-16 bg-slate-200 dark:bg-slate-800 rounded ml-auto"></div></td>
+                <tr key={i} className="animate-pulse h-10">
+                  <td className="px-4 py-2.5"><div className="h-3 w-24 bg-muted rounded"></div></td>
+                  <td className="px-4 py-2.5"><div className="h-3 w-14 bg-muted rounded"></div></td>
+                  <td className="px-4 py-2.5"><div className="h-3 w-16 bg-muted rounded"></div></td>
+                  <td className="px-4 py-2.5"><div className="h-3 w-12 bg-muted rounded ml-auto"></div></td>
+                  <td className="px-4 py-2.5"><div className="h-3 w-12 bg-muted rounded ml-auto"></div></td>
+                  <td className="px-4 py-2.5"><div className="h-3 w-12 bg-muted rounded ml-auto"></div></td>
+                  <td className="px-4 py-2.5"><div className="h-3 w-12 bg-muted rounded ml-auto"></div></td>
+                  <td className="px-4 py-2.5"><div className="h-3 w-12 bg-muted rounded ml-auto"></div></td>
+                  <td className="px-4 py-2.5"><div className="h-3 w-12 bg-muted rounded ml-auto"></div></td>
+                  <td className="px-4 py-2.5"><div className="h-3 w-16 bg-muted rounded ml-auto"></div></td>
                 </tr>
               ))
             ) : top10Summary.length === 0 ? (
               <tr>
-                <td colSpan={10} className="px-4 py-12 text-center text-slate-400 dark:text-slate-500 font-medium h-[352px]">
+                <td colSpan={10} className="px-4 py-12 text-center text-muted-foreground font-medium h-[352px]">
                   No data found
                 </td>
               </tr>
@@ -140,38 +142,38 @@ export function SummaryCustomersCard({
                 <tr
                   key={idx}
                   onClick={() => setCustomer(customer === item.customer ? "all" : item.customer)}
-                  className={`hover:bg-slate-50 dark:hover:bg-slate-800/20 cursor-pointer transition-colors even:bg-slate-50/30 dark:even:bg-slate-800/5 h-11 ${
-                    customer === item.customer ? "bg-theme-orange/10 dark:bg-theme-orange/5" : ""
+                  className={`hover:bg-secondary/60 cursor-pointer transition-colors h-10 ${
+                    customer === item.customer ? "bg-primary/10 dark:bg-primary/15 font-semibold" : ""
                   }`}
                 >
-                  <td className="px-4 py-3 font-semibold text-slate-700 dark:text-slate-300 truncate max-w-[120px]" title={item.customer}>
+                  <td className="px-4 py-2.5 font-medium text-foreground truncate max-w-[120px]" title={item.customer}>
                     {item.customer}
                   </td>
-                  <td className="px-4 py-3 font-medium text-slate-600 dark:text-slate-400 truncate max-w-[100px]" title={item.branch}>
+                  <td className="px-4 py-2.5 text-muted-foreground truncate max-w-[100px]" title={item.branch}>
                     {item.branch || "-"}
                   </td>
-                  <td className="px-4 py-3 font-medium text-slate-600 dark:text-slate-400 truncate max-w-[100px]" title={item.group}>
+                  <td className="px-4 py-2.5 text-muted-foreground truncate max-w-[100px]" title={item.group}>
                     {item.group || "-"}
                   </td>
-                  <td className="px-4 py-3 text-right font-medium text-slate-650 dark:text-slate-350">
+                  <td className="px-4 py-2.5 text-right tabular-nums text-muted-foreground">
                     {item.current ? formatAmount(item.current) : "0"}
                   </td>
-                  <td className="px-4 py-3 text-right font-medium text-slate-650 dark:text-slate-350">
+                  <td className="px-4 py-2.5 text-right tabular-nums text-muted-foreground">
                     {item["1-30"] ? formatAmount(item["1-30"]) : "0"}
                   </td>
-                  <td className="px-4 py-3 text-right font-medium text-slate-650 dark:text-slate-350">
+                  <td className="px-4 py-2.5 text-right tabular-nums text-muted-foreground">
                     {item["31-60"] ? formatAmount(item["31-60"]) : "0"}
                   </td>
-                  <td className="px-4 py-3 text-right font-medium text-slate-650 dark:text-slate-350">
+                  <td className="px-4 py-2.5 text-right tabular-nums text-muted-foreground">
                     {item["61-90"] ? formatAmount(item["61-90"]) : "0"}
                   </td>
-                  <td className="px-4 py-3 text-right font-medium text-slate-650 dark:text-slate-350">
+                  <td className="px-4 py-2.5 text-right tabular-nums text-muted-foreground">
                     {item["91-180"] ? formatAmount(item["91-180"]) : "0"}
                   </td>
-                  <td className="px-4 py-3 text-right font-medium text-slate-650 dark:text-slate-350">
+                  <td className="px-4 py-2.5 text-right tabular-nums text-muted-foreground">
                     {item["over180"] ? formatAmount(item["over180"]) : "0"}
                   </td>
-                  <td className="px-4 py-3 text-right font-bold text-slate-800 dark:text-slate-100">
+                  <td className="px-4 py-2.5 text-right tabular-nums font-bold text-foreground">
                     {formatAmount(item.amountDue)}
                   </td>
                 </tr>
@@ -183,48 +185,51 @@ export function SummaryCustomersCard({
 
       {/* Table Footer with Modal */}
       {!loading && filteredSummaryBase.length > 0 && (
-        <div className="border-t border-gray-100 dark:border-slate-850 px-4 py-3 flex items-center justify-between text-xs bg-slate-50/50 dark:bg-slate-900/30 mt-auto">
+        <div className="border-t border-border px-4 py-3 flex items-center justify-between text-xs bg-muted/30 mt-auto">
           <Dialog>
-            <DialogTrigger className="cursor-pointer group flex items-center gap-2 hover:text-theme-orange transition-colors">
-              <div className="font-bold text-slate-700 dark:text-slate-300">
-                Grand Total: <span className="text-theme-orange ml-1 underline decoration-dotted">{formatAmount(totalSummaryAmountDue)}</span>
+            <DialogTrigger className="cursor-pointer group flex items-center gap-2 hover:text-primary transition-colors">
+              <div className="font-medium text-muted-foreground">
+                Grand Total: <span className="font-bold text-foreground ml-1 tabular-nums">{formatAmount(totalSummaryAmountDue)}</span>
               </div>
-              <span className="text-[10px] font-semibold text-theme-orange bg-theme-orange/10 border border-theme-orange/30 rounded px-2 py-0.5 group-hover:bg-theme-orange group-hover:text-white transition-colors">
+              <span className="text-[10px] font-semibold text-primary bg-primary/10 border border-primary/20 rounded px-2 py-0.5 group-hover:bg-primary group-hover:text-white transition-colors">
                 Lihat Detail
               </span>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[90vw] lg:max-w-6xl w-full max-h-[88vh] flex flex-col bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-2xl p-0 overflow-hidden z-[70]">
-              <DialogHeader className="px-6 py-4 border-b border-gray-100 dark:border-slate-800 flex-shrink-0 flex flex-col sm:flex-row sm:items-center justify-between gap-3 pr-14 sm:pr-16">
-                <DialogTitle className="text-lg font-bold text-slate-800 dark:text-white flex items-center gap-2">
-                  <FileSpreadsheet className="w-5 h-5 text-theme-orange" />
-                  Detail Summary Customers <span className="text-sm font-normal italic text-slate-500 tracking-normal">in home currency</span>
+            <DialogContent className="sm:max-w-[90vw] lg:max-w-6xl w-full max-h-[88vh] flex flex-col bg-card border border-border rounded-2xl p-0 overflow-hidden z-[70]">
+              <DialogHeader className="px-6 py-4 border-b border-border flex-shrink-0 flex flex-col sm:flex-row sm:items-center justify-between gap-3 pr-14 sm:pr-16">
+                <DialogTitle className="text-base font-bold text-foreground flex items-center gap-2">
+                  <FileSpreadsheet className="w-4 h-4 text-primary" />
+                  Detail Summary Customers <span className="text-xs font-normal text-muted-foreground tracking-normal">home currency</span>
                 </DialogTitle>
-                <div className="flex items-center gap-3">
-                  <button
-                    onClick={() => exportToExcel(sortedSummaryModal, "Detail_Summary_Customers", columnMapping)}
-                    disabled={sortedSummaryModal.length === 0}
-                    className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-lg text-xs transition-colors cursor-pointer disabled:opacity-40"
-                    title="Export to Excel"
-                  >
-                    <Download className="w-3.5 h-3.5" />
-                    <span>Excel</span>
-                  </button>
-                  <div className="relative w-full sm:w-56">
-                    <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                <div className="flex items-center gap-3 w-full sm:w-auto">
+                  <div className="relative w-full sm:w-64">
+                    <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
                     <input
                       type="text"
                       placeholder="Cari customer / group / branch..."
                       value={summarySearch}
-                      onChange={(e) => setSummarySearch(e.target.value)}
-                      className="w-full text-xs pl-8 pr-3 py-1.5 rounded-lg border border-gray-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-200 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-theme-orange"
+                      onChange={(e) => {
+                        setSummarySearch(e.target.value);
+                        setSummaryModalPage(1);
+                      }}
+                      className="w-full text-xs pl-8 pr-3 py-1.5 rounded-lg border border-border bg-secondary/50 text-foreground placeholder-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary transition-all"
                     />
                   </div>
+                  <button
+                    onClick={() => exportToExcel(filteredSummaryModal, "Detail_Summary_Customers", columnMapping)}
+                    disabled={filteredSummaryModal.length === 0}
+                    className="flex items-center gap-1.5 px-3 py-1.5 bg-[#E3EFE9] hover:bg-[#D4E8DC] dark:bg-[#1C2C24] dark:hover:bg-[#23382D] text-[#246A4B] dark:text-[#86EFAC] border border-[#C5DFD2] dark:border-[#2D4D3D] font-medium rounded-lg text-xs transition-colors cursor-pointer disabled:opacity-40"
+                    title="Export All to Excel"
+                  >
+                    <Download className="w-3.5 h-3.5" />
+                    <span>Excel</span>
+                  </button>
                 </div>
               </DialogHeader>
-              <div className="overflow-auto flex-1 p-6">
-                <table className="w-full text-left border-collapse whitespace-nowrap text-xs">
+              <div className="overflow-auto flex-1 p-0">
+                <table className="w-full text-left border-collapse whitespace-nowrap">
                   <thead>
-                    <tr className="bg-theme-brown text-white text-[10px] uppercase font-bold tracking-wider h-10 sticky top-0 z-10">
+                    <tr className="bg-secondary/70 dark:bg-secondary/40 border-b border-border text-[10px] uppercase font-semibold tracking-wider h-9 sticky top-0 z-10 backdrop-blur-xs">
                       {renderSortableHeader("Customer", "customer", summarySortCol, summarySortDir, (c) => handleToggleSort(c, summarySortCol, summarySortDir, setSummarySortCol, setSummarySortDir), "left")}
                       {renderSortableHeader("Branch", "branch", summarySortCol, summarySortDir, (c) => handleToggleSort(c, summarySortCol, summarySortDir, setSummarySortCol, setSummarySortDir), "left")}
                       {renderSortableHeader("Group", "group", summarySortCol, summarySortDir, (c) => handleToggleSort(c, summarySortCol, summarySortDir, setSummarySortCol, setSummarySortDir), "left")}
@@ -237,53 +242,86 @@ export function SummaryCustomersCard({
                       {renderSortableHeader("Amount Due", "amountDue", summarySortCol, summarySortDir, (c) => handleToggleSort(c, summarySortCol, summarySortDir, setSummarySortCol, setSummarySortDir), "right")}
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-100 dark:divide-slate-800/50">
-                    {paginatedSummaryModal.map((item, idx) => (
-                      <tr key={idx} className="hover:bg-slate-50 dark:hover:bg-slate-800/20 even:bg-slate-50/30 dark:even:bg-slate-800/5 h-11">
-                        <td className="px-4 py-3 font-semibold text-slate-700 dark:text-slate-300">{item.customer}</td>
-                        <td className="px-4 py-3 font-medium text-slate-600 dark:text-slate-400">{item.branch || "-"}</td>
-                        <td className="px-4 py-3 font-medium text-slate-600 dark:text-slate-400">{item.group || "-"}</td>
-                        <td className="px-4 py-3 text-right font-medium">{item.current ? formatAmount(item.current) : "0"}</td>
-                        <td className="px-4 py-3 text-right font-medium">{item["1-30"] ? formatAmount(item["1-30"]) : "0"}</td>
-                        <td className="px-4 py-3 text-right font-medium">{item["31-60"] ? formatAmount(item["31-60"]) : "0"}</td>
-                        <td className="px-4 py-3 text-right font-medium">{item["61-90"] ? formatAmount(item["61-90"]) : "0"}</td>
-                        <td className="px-4 py-3 text-right font-medium">{item["91-180"] ? formatAmount(item["91-180"]) : "0"}</td>
-                        <td className="px-4 py-3 text-right font-medium">{item["over180"] ? formatAmount(item["over180"]) : "0"}</td>
-                        <td className="px-4 py-3 text-right font-bold text-slate-800 dark:text-slate-100">{formatAmount(item.amountDue)}</td>
+                  <tbody className="divide-y divide-border/60 text-xs">
+                    {paginatedSummaryModal.length === 0 ? (
+                      <tr>
+                        <td colSpan={10} className="px-4 py-12 text-center text-muted-foreground font-medium">
+                          No customer data found
+                        </td>
                       </tr>
-                    ))}
+                    ) : (
+                      paginatedSummaryModal.map((item, idx) => (
+                        <tr
+                          key={idx}
+                          onClick={() => setCustomer(customer === item.customer ? "all" : item.customer)}
+                          className={`hover:bg-secondary/60 cursor-pointer transition-colors h-10 ${
+                            customer === item.customer ? "bg-primary/10 dark:bg-primary/15 font-semibold" : ""
+                          }`}
+                        >
+                          <td className="px-4 py-2.5 font-medium text-foreground truncate max-w-[200px]" title={item.customer}>
+                            {item.customer}
+                          </td>
+                          <td className="px-4 py-2.5 text-muted-foreground truncate max-w-[120px]" title={item.branch}>
+                            {item.branch || "-"}
+                          </td>
+                          <td className="px-4 py-2.5 text-muted-foreground truncate max-w-[120px]" title={item.group}>
+                            {item.group || "-"}
+                          </td>
+                          <td className="px-4 py-2.5 text-right tabular-nums text-muted-foreground">
+                            {item.current ? formatAmount(item.current) : "0"}
+                          </td>
+                          <td className="px-4 py-2.5 text-right tabular-nums text-muted-foreground">
+                            {item["1-30"] ? formatAmount(item["1-30"]) : "0"}
+                          </td>
+                          <td className="px-4 py-2.5 text-right tabular-nums text-muted-foreground">
+                            {item["31-60"] ? formatAmount(item["31-60"]) : "0"}
+                          </td>
+                          <td className="px-4 py-2.5 text-right tabular-nums text-muted-foreground">
+                            {item["61-90"] ? formatAmount(item["61-90"]) : "0"}
+                          </td>
+                          <td className="px-4 py-2.5 text-right tabular-nums text-muted-foreground">
+                            {item["91-180"] ? formatAmount(item["91-180"]) : "0"}
+                          </td>
+                          <td className="px-4 py-2.5 text-right tabular-nums text-muted-foreground">
+                            {item["over180"] ? formatAmount(item["over180"]) : "0"}
+                          </td>
+                          <td className="px-4 py-2.5 text-right tabular-nums font-bold text-foreground">
+                            {formatAmount(item.amountDue)}
+                          </td>
+                        </tr>
+                      ))
+                    )}
                   </tbody>
                 </table>
               </div>
-              <div className="border-t border-gray-100 dark:border-slate-800 px-6 py-3 flex items-center justify-between text-xs bg-slate-50/50 dark:bg-slate-900/30 flex-shrink-0">
-                <div className="font-bold text-slate-700 dark:text-slate-300">
-                  Grand Total: <span className="text-theme-orange ml-1">{formatAmount(totalSummaryAmountDue)}</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <span className="text-slate-500">
-                    {(summaryModalPage - 1) * itemsPerPageModal + 1}-{Math.min(summaryModalPage * itemsPerPageModal, sortedSummaryModal.length)} / {sortedSummaryModal.length}
+              <div className="border-t border-border px-6 py-3 flex items-center justify-between text-xs bg-muted/30 flex-shrink-0">
+                <span className="text-muted-foreground">
+                  Showing {(summaryModalPage - 1) * itemsPerPageModal + 1} to{" "}
+                  {Math.min(summaryModalPage * itemsPerPageModal, filteredSummaryModal.length)} of {filteredSummaryModal.length} entries
+                </span>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setSummaryModalPage((p) => Math.max(1, p - 1))}
+                    disabled={summaryModalPage === 1}
+                    className="px-2.5 py-1 rounded-md border border-border bg-secondary text-secondary-foreground text-xs disabled:opacity-40 cursor-pointer"
+                  >
+                    Prev
+                  </button>
+                  <span className="font-semibold text-foreground">
+                    {summaryModalPage} / {totalSummaryPagesModal}
                   </span>
-                  <div className="flex items-center gap-1">
-                    <button
-                      onClick={() => setSummaryModalPage(p => Math.max(1, p - 1))}
-                      disabled={summaryModalPage === 1}
-                      className="p-1 rounded border border-gray-255 dark:border-slate-700 hover:bg-white dark:hover:bg-slate-800 disabled:opacity-40 transition-colors cursor-pointer"
-                    >
-                      &lt;
-                    </button>
-                    <button
-                      onClick={() => setSummaryModalPage(p => Math.min(totalSummaryPagesModal, p + 1))}
-                      disabled={summaryModalPage === totalSummaryPagesModal}
-                      className="p-1 rounded border border-gray-255 dark:border-slate-700 hover:bg-white dark:hover:bg-slate-800 disabled:opacity-40 transition-colors cursor-pointer"
-                    >
-                      &gt;
-                    </button>
-                  </div>
+                  <button
+                    onClick={() => setSummaryModalPage((p) => Math.min(totalSummaryPagesModal, p + 1))}
+                    disabled={summaryModalPage >= totalSummaryPagesModal}
+                    className="px-2.5 py-1 rounded-md border border-border bg-secondary text-secondary-foreground text-xs disabled:opacity-40 cursor-pointer"
+                  >
+                    Next
+                  </button>
                 </div>
               </div>
             </DialogContent>
           </Dialog>
-          <span className="text-slate-400 text-[11px] font-medium">Top 10 Displayed</span>
+          <span className="text-muted-foreground text-[11px] font-medium">Top 10 Displayed</span>
         </div>
       )}
     </Card>

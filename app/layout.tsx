@@ -1,4 +1,4 @@
-import { Geist, Geist_Mono, Space_Grotesk } from "next/font/google"
+import { Geist_Mono, Space_Grotesk } from "next/font/google"
 
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
@@ -20,9 +20,9 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={cn("antialiased", fontMono.variable, "font-sans", spaceGrotesk.variable)}
+      className={cn("antialiased font-mono", fontMono.variable)}
     >
-      <body>
+      <body className="font-mono">
         <ThemeProvider>{children}</ThemeProvider>
       </body>
     </html>

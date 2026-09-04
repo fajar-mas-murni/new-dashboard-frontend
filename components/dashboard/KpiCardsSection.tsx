@@ -43,22 +43,22 @@ export function KpiCardsSection({
   );
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
       {/* Card 1: Unpaid Invoices Amount */}
-      <Card
-        className={`bg-white/95 dark:bg-slate-900/95 rounded-2xl border p-5 flex flex-row items-center gap-4 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 relative ring-0 py-5 overflow-hidden border-gray-200/80 dark:border-slate-800/40`}
-      >
-        <div className="absolute left-0 top-1/4 bottom-1/4 w-1 bg-gradient-to-b from-theme-yellow to-theme-amber rounded-r-full"></div>
-        <div className="flex-shrink-0 p-3 bg-theme-yellow/10 dark:bg-theme-yellow/5 border border-theme-yellow/20 dark:border-theme-yellow/10 rounded-xl">
-          <FileText className="w-5.5 h-5.5 text-theme-amber dark:text-theme-yellow" strokeWidth={2.2} />
+      <Card className="bg-card rounded-2xl border border-border/80 p-5 flex flex-row items-center gap-4 shadow-xs hover:border-primary/30 hover:shadow-sm transition-all duration-200 relative overflow-hidden">
+        <div className="flex-shrink-0 w-11 h-11 rounded-xl bg-[#FEF3D6] dark:bg-[#332A15] text-[#B47818] dark:text-[#FCD34D] border border-[#F9E5B5] dark:border-[#52411E] flex items-center justify-center">
+          <FileText className="w-5 h-5" strokeWidth={2} />
         </div>
         <CardContent className="p-0 min-w-0 flex-1">
-          <p className="text-[10px] sm:text-[11px] font-semibold text-slate-500 dark:text-slate-400 tracking-wider uppercase flex items-center justify-between">
-            <span>Unpaid Invoices Amount</span>
+          <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
+            Unpaid Invoices
           </p>
-          <div className="text-xl sm:text-2xl font-extrabold text-slate-800 dark:text-white mt-0.5 tracking-tight truncate">
+          <div
+            className="text-sm sm:text-base 2xl:text-[17px] font-bold text-foreground mt-0.5 tracking-tight tabular-nums whitespace-nowrap overflow-hidden text-ellipsis"
+            title={formatAmount(currentSummary["unpaid-invoice"] || 0)}
+          >
             {loading ? (
-              <div className="h-7 w-28 bg-slate-200 dark:bg-slate-800 rounded-md animate-pulse mt-1" />
+              <div className="h-6 w-24 bg-muted rounded-md animate-pulse mt-1" />
             ) : (
               formatAmount(currentSummary["unpaid-invoice"] || 0)
             )}
@@ -67,20 +67,20 @@ export function KpiCardsSection({
       </Card>
 
       {/* Card 2: Overdue Amount */}
-      <Card
-        className={`bg-white/95 dark:bg-slate-900/95 rounded-2xl border p-5 flex flex-row items-center gap-4 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 relative ring-0 py-5 overflow-hidden border-gray-200/80 dark:border-slate-800/40`}
-      >
-        <div className="absolute left-0 top-1/4 bottom-1/4 w-1 bg-gradient-to-b from-theme-amber to-theme-orange rounded-r-full"></div>
-        <div className="flex-shrink-0 p-3 bg-theme-orange/10 dark:bg-theme-orange/5 border border-theme-orange/20 dark:border-theme-orange/10 rounded-xl">
-          <Clock className="w-5.5 h-5.5 text-theme-orange dark:text-theme-amber" strokeWidth={2.2} />
+      <Card className="bg-card rounded-2xl border border-border/80 p-5 flex flex-row items-center gap-4 shadow-xs hover:border-primary/30 hover:shadow-sm transition-all duration-200 relative overflow-hidden">
+        <div className="flex-shrink-0 w-11 h-11 rounded-xl bg-[#FDE8DF] dark:bg-[#361E17] text-[#D86A46] dark:text-[#FDBA74] border border-[#F8D2C3] dark:border-[#572B20] flex items-center justify-center">
+          <Clock className="w-5 h-5" strokeWidth={2} />
         </div>
         <CardContent className="p-0 min-w-0 flex-1">
-          <p className="text-[10px] sm:text-[11px] font-semibold text-slate-500 dark:text-slate-400 tracking-wider uppercase flex items-center justify-between">
-            <span>Overdue Amount</span>
+          <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
+            Overdue Amount
           </p>
-          <div className="text-xl sm:text-2xl font-extrabold text-slate-800 dark:text-white mt-0.5 tracking-tight truncate">
+          <div
+            className="text-sm sm:text-base 2xl:text-[17px] font-bold text-foreground mt-0.5 tracking-tight tabular-nums whitespace-nowrap overflow-hidden text-ellipsis"
+            title={formatAmount(currentSummary["overdue-amount"] || 0)}
+          >
             {loading ? (
-              <div className="h-7 w-28 bg-slate-200 dark:bg-slate-800 rounded-md animate-pulse mt-1" />
+              <div className="h-6 w-24 bg-muted rounded-md animate-pulse mt-1" />
             ) : (
               formatAmount(currentSummary["overdue-amount"] || 0)
             )}
@@ -89,20 +89,20 @@ export function KpiCardsSection({
       </Card>
 
       {/* Card 3: Overdue 30+ Days */}
-      <Card
-        className={`bg-white/95 dark:bg-slate-900/95 rounded-2xl border p-5 flex flex-row items-center gap-4 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 relative ring-0 py-5 overflow-hidden border-gray-200/80 dark:border-slate-800/40`}
-      >
-        <div className="absolute left-0 top-1/4 bottom-1/4 w-1 bg-gradient-to-b from-theme-orange to-theme-red rounded-r-full"></div>
-        <div className="flex-shrink-0 p-3 bg-theme-red/10 dark:bg-theme-red/5 border border-theme-red/20 dark:border-theme-red/10 rounded-xl">
-          <Calendar className="w-5.5 h-5.5 text-theme-red dark:text-theme-orange" strokeWidth={2.2} />
+      <Card className="bg-card rounded-2xl border border-border/80 p-5 flex flex-row items-center gap-4 shadow-xs hover:border-primary/30 hover:shadow-sm transition-all duration-200 relative overflow-hidden">
+        <div className="flex-shrink-0 w-11 h-11 rounded-xl bg-[#FCE7EC] dark:bg-[#351720] text-[#C84C6F] dark:text-[#F472B6] border border-[#F7CFD9] dark:border-[#54212F] flex items-center justify-center">
+          <Calendar className="w-5 h-5" strokeWidth={2} />
         </div>
         <CardContent className="p-0 min-w-0 flex-1">
-          <p className="text-[10px] sm:text-[11px] font-semibold text-slate-500 dark:text-slate-400 tracking-wider uppercase flex items-center justify-between">
-            <span>Overdue 30+ Days</span>
+          <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
+            Overdue 30+ Days
           </p>
-          <div className="text-xl sm:text-2xl font-extrabold text-slate-800 dark:text-white mt-0.5 tracking-tight truncate">
+          <div
+            className="text-sm sm:text-base 2xl:text-[17px] font-bold text-foreground mt-0.5 tracking-tight tabular-nums whitespace-nowrap overflow-hidden text-ellipsis"
+            title={formatAmount(currentSummary["overdue-30-plus"] || 0)}
+          >
             {loading ? (
-              <div className="h-7 w-28 bg-slate-200 dark:bg-slate-800 rounded-md animate-pulse mt-1" />
+              <div className="h-6 w-24 bg-muted rounded-md animate-pulse mt-1" />
             ) : (
               formatAmount(currentSummary["overdue-30-plus"] || 0)
             )}
@@ -111,20 +111,20 @@ export function KpiCardsSection({
       </Card>
 
       {/* Card 4: Overdue 90+ Days */}
-      <Card
-        className={`bg-white/95 dark:bg-slate-900/95 rounded-2xl border p-5 flex flex-row items-center gap-4 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 relative ring-0 py-5 overflow-hidden border-gray-200/80 dark:border-slate-800/40`}
-      >
-        <div className="absolute left-0 top-1/4 bottom-1/4 w-1 bg-gradient-to-b from-theme-red to-theme-brown rounded-r-full"></div>
-        <div className="flex-shrink-0 p-3 bg-theme-brown/10 dark:bg-theme-brown/5 border border-theme-brown/20 dark:border-theme-brown/10 rounded-xl">
-          <CalendarDays className="w-5.5 h-5.5 text-theme-brown dark:text-theme-red" strokeWidth={2.2} />
+      <Card className="bg-card rounded-2xl border border-border/80 p-5 flex flex-row items-center gap-4 shadow-xs hover:border-primary/30 hover:shadow-sm transition-all duration-200 relative overflow-hidden">
+        <div className="flex-shrink-0 w-11 h-11 rounded-xl bg-[#EAE9F8] dark:bg-[#25203A] text-[#6355A5] dark:text-[#C4B5FD] border border-[#D7D5F3] dark:border-[#3D345E] flex items-center justify-center">
+          <CalendarDays className="w-5 h-5" strokeWidth={2} />
         </div>
         <CardContent className="p-0 min-w-0 flex-1">
-          <p className="text-[10px] sm:text-[11px] font-semibold text-slate-500 dark:text-slate-400 tracking-wider uppercase flex items-center justify-between">
-            <span>Overdue 90+ Days</span>
+          <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
+            Overdue 90+ Days
           </p>
-          <div className="text-xl sm:text-2xl font-extrabold text-slate-800 dark:text-white mt-0.5 tracking-tight truncate">
+          <div
+            className="text-sm sm:text-base 2xl:text-[17px] font-bold text-foreground mt-0.5 tracking-tight tabular-nums whitespace-nowrap overflow-hidden text-ellipsis"
+            title={formatAmount(currentSummary["overdue-90-plus"] || 0)}
+          >
             {loading ? (
-              <div className="h-7 w-28 bg-slate-200 dark:bg-slate-800 rounded-md animate-pulse mt-1" />
+              <div className="h-6 w-24 bg-muted rounded-md animate-pulse mt-1" />
             ) : (
               formatAmount(currentSummary["overdue-90-plus"] || 0)
             )}

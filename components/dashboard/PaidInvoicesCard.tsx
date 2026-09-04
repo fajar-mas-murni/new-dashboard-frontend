@@ -87,27 +87,29 @@ export function PaidInvoicesCard({
   };
 
   return (
-    <Card className="bg-white/95 dark:bg-slate-900/95 rounded-2xl border border-gray-200/80 dark:border-slate-800/40 shadow-sm overflow-hidden flex flex-col h-[500px]">
+    <Card className="bg-card rounded-2xl border border-border/80 shadow-xs overflow-hidden flex flex-col h-[500px] transition-colors">
       <CardHeader className="px-5 py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 flex-shrink-0">
         <div className="flex items-center gap-2.5">
-          <FileText className="w-5 h-5 text-theme-orange" />
-          <CardTitle className="text-lg font-bold text-slate-800 dark:text-white flex items-center flex-wrap gap-x-1">
-            Paid invoices by customer{" "}
-            <span className="text-sm font-normal italic text-slate-500 tracking-normal">in home currency</span>
+          <div className="w-8 h-8 rounded-lg bg-[#EAE9F8] dark:bg-[#25203A] text-[#6355A5] dark:text-[#C4B5FD] border border-[#D7D5F3] dark:border-[#3D345E] flex items-center justify-center flex-shrink-0">
+            <FileText className="w-4 h-4" />
+          </div>
+          <CardTitle className="text-base font-bold text-foreground flex items-center flex-wrap gap-x-2">
+            <span>Paid Invoices by Customer</span>
+            <span className="text-xs font-normal text-muted-foreground tracking-normal">home currency</span>
           </CardTitle>
         </div>
         <div className="flex items-center gap-2.5 w-full sm:w-auto">
           <button
             onClick={() => exportToExcel(sortedPaid, "Paid_Invoices_By_Customer", columnMapping)}
             disabled={loading || sortedPaid.length === 0}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-lg text-xs transition-colors cursor-pointer disabled:opacity-40"
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-[#E3EFE9] hover:bg-[#D4E8DC] dark:bg-[#1C2C24] dark:hover:bg-[#23382D] text-[#246A4B] dark:text-[#86EFAC] border border-[#C5DFD2] dark:border-[#2D4D3D] font-medium rounded-lg text-xs transition-colors cursor-pointer disabled:opacity-40"
             title="Export to Excel"
           >
             <Download className="w-3.5 h-3.5" />
             <span>Excel</span>
           </button>
-          <div className="relative w-full sm:w-44">
-            <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" />
+          <div className="relative w-full sm:w-48">
+            <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
             <input
               type="text"
               placeholder="Cari customer / group / branch..."
@@ -116,16 +118,16 @@ export function PaidInvoicesCard({
                 setPaidSearch(e.target.value);
                 setPaidPage(1);
               }}
-              className="w-full text-xs pl-8 pr-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-900/80 text-slate-800 dark:text-slate-200 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-theme-orange transition-all"
+              className="w-full text-xs pl-8 pr-2.5 py-1.5 rounded-lg border border-border bg-secondary/50 text-foreground placeholder-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary transition-all"
             />
           </div>
         </div>
       </CardHeader>
       <Separator />
-      <div className="overflow-auto flex-1 text-slate-800 dark:text-slate-100" style={{ scrollbarGutter: "stable" }}>
+      <div className="overflow-auto flex-1 text-foreground" style={{ scrollbarGutter: "stable" }}>
         <table className="w-full text-left border-collapse whitespace-nowrap">
           <thead>
-            <tr className="bg-theme-brown text-white text-[10px] uppercase font-bold tracking-wider h-10 sticky top-0 z-10">
+            <tr className="bg-secondary/70 dark:bg-secondary/40 border-b border-border text-[10px] uppercase font-semibold tracking-wider h-9 sticky top-0 z-10 backdrop-blur-xs">
               {renderSortableHeader("Customer", "customer", paidSortCol, paidSortDir, (c) => handleToggleSort(c, paidSortCol, paidSortDir, setPaidSortCol, setPaidSortDir), "left")}
               {renderSortableHeader("Branch", "branch", paidSortCol, paidSortDir, (c) => handleToggleSort(c, paidSortCol, paidSortDir, setPaidSortCol, setPaidSortDir), "left")}
               {renderSortableHeader("Group", "group", paidSortCol, paidSortDir, (c) => handleToggleSort(c, paidSortCol, paidSortDir, setPaidSortCol, setPaidSortDir), "left")}
@@ -134,21 +136,21 @@ export function PaidInvoicesCard({
               {renderSortableHeader("Last 12 Month", "last12Month", paidSortCol, paidSortDir, (c) => handleToggleSort(c, paidSortCol, paidSortDir, setPaidSortCol, setPaidSortDir), "right")}
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-100 dark:divide-slate-800/50 text-xs">
+          <tbody className="divide-y divide-border/60 text-xs">
             {loading ? (
               Array.from({ length: 8 }).map((_, i) => (
-                <tr key={i} className="animate-pulse h-11">
-                  <td className="px-4 py-3"><div className="h-3 w-32 bg-slate-200 dark:bg-slate-800 rounded"></div></td>
-                  <td className="px-4 py-3"><div className="h-3 w-14 bg-slate-200 dark:bg-slate-800 rounded"></div></td>
-                  <td className="px-4 py-3"><div className="h-3 w-16 bg-slate-200 dark:bg-slate-800 rounded"></div></td>
-                  <td className="px-4 py-3"><div className="h-3 w-16 bg-slate-200 dark:bg-slate-800 rounded ml-auto"></div></td>
-                  <td className="px-4 py-3"><div className="h-3 w-16 bg-slate-200 dark:bg-slate-800 rounded ml-auto"></div></td>
-                  <td className="px-4 py-3"><div className="h-3 w-20 bg-slate-200 dark:bg-slate-800 rounded ml-auto"></div></td>
+                <tr key={i} className="animate-pulse h-10">
+                  <td className="px-4 py-2.5"><div className="h-3 w-32 bg-muted rounded"></div></td>
+                  <td className="px-4 py-2.5"><div className="h-3 w-14 bg-muted rounded"></div></td>
+                  <td className="px-4 py-2.5"><div className="h-3 w-16 bg-muted rounded"></div></td>
+                  <td className="px-4 py-2.5"><div className="h-3 w-16 bg-muted rounded ml-auto"></div></td>
+                  <td className="px-4 py-2.5"><div className="h-3 w-16 bg-muted rounded ml-auto"></div></td>
+                  <td className="px-4 py-2.5"><div className="h-3 w-20 bg-muted rounded ml-auto"></div></td>
                 </tr>
               ))
             ) : sortedPaid.length === 0 ? (
               <tr>
-                <td colSpan={6} className="px-4 py-12 text-center text-slate-400 dark:text-slate-500 font-medium h-[352px]">
+                <td colSpan={6} className="px-4 py-12 text-center text-muted-foreground font-medium h-[352px]">
                   No data found
                 </td>
               </tr>
@@ -157,50 +159,41 @@ export function PaidInvoicesCard({
                 const isCurrentSelected = customer === item.customer;
 
                 const currentBg = item.currentMonth > 0
-                  ? `rgba(26, 54, 68, ${Math.max(0.08, (item.currentMonth / maxCurrentMonth) * 0.85)})`
+                  ? `rgba(131, 188, 169, ${Math.min(0.35, Math.max(0.08, (item.currentMonth / maxCurrentMonth) * 0.35))})`
                   : "transparent";
-                const currentText = item.currentMonth > 0 && (item.currentMonth / maxCurrentMonth > 0.55)
-                  ? "text-white font-semibold"
-                  : "text-slate-750 dark:text-slate-250 font-semibold";
 
                 const lastBg = item.lastMonth > 0
-                  ? `rgba(26, 54, 68, ${Math.max(0.08, (item.lastMonth / maxLastMonth) * 0.85)})`
+                  ? `rgba(131, 188, 169, ${Math.min(0.35, Math.max(0.08, (item.lastMonth / maxLastMonth) * 0.35))})`
                   : "transparent";
-                const lastText = item.lastMonth > 0 && (item.lastMonth / maxLastMonth > 0.55)
-                  ? "text-white font-semibold"
-                  : "text-slate-750 dark:text-slate-250 font-semibold";
 
                 const last12Bg = item.last12Month > 0
-                  ? `rgba(224, 86, 36, ${Math.max(0.08, (item.last12Month / maxLast12Month) * 0.75)})`
+                  ? `rgba(231, 139, 120, ${Math.min(0.35, Math.max(0.08, (item.last12Month / maxLast12Month) * 0.35))})`
                   : "transparent";
-                const last12Text = item.last12Month > 0 && (item.last12Month / maxLast12Month > 0.5)
-                  ? "text-white font-bold"
-                  : "text-slate-800 dark:text-slate-200 font-bold";
 
                 return (
                   <tr
                     key={idx}
                     onClick={() => setCustomer(customer === item.customer ? "all" : item.customer)}
-                    className={`hover:bg-slate-50 dark:hover:bg-slate-800/20 cursor-pointer transition-colors even:bg-slate-50/30 dark:even:bg-slate-800/5 h-11 ${
-                      isCurrentSelected ? "bg-theme-orange/10 dark:bg-theme-orange/5" : ""
+                    className={`hover:bg-secondary/60 cursor-pointer transition-colors h-10 ${
+                      isCurrentSelected ? "bg-primary/10 dark:bg-primary/15 font-semibold" : ""
                     }`}
                   >
-                    <td className="px-4 py-3 font-semibold text-slate-700 dark:text-slate-300 truncate max-w-[180px]" title={item.customer}>
+                    <td className="px-4 py-2.5 font-medium text-foreground truncate max-w-[180px]" title={item.customer}>
                       {item.customer}
                     </td>
-                    <td className="px-4 py-3 font-medium text-slate-600 dark:text-slate-400 truncate max-w-[100px]" title={item.branch}>
+                    <td className="px-4 py-2.5 text-muted-foreground truncate max-w-[100px]" title={item.branch}>
                       {item.branch || "-"}
                     </td>
-                    <td className="px-4 py-3 font-medium text-slate-600 dark:text-slate-400 truncate max-w-[100px]" title={item.group}>
+                    <td className="px-4 py-2.5 text-muted-foreground truncate max-w-[100px]" title={item.group}>
                       {item.group || "-"}
                     </td>
-                    <td className={`px-4 py-3 text-right ${currentText}`} style={{ backgroundColor: currentBg }}>
+                    <td className="px-4 py-2.5 text-right tabular-nums text-foreground/90 font-medium" style={{ backgroundColor: currentBg }}>
                       {item.currentMonth ? formatPaidAmount(item.currentMonth) : "0"}
                     </td>
-                    <td className={`px-4 py-3 text-right ${lastText}`} style={{ backgroundColor: lastBg }}>
+                    <td className="px-4 py-2.5 text-right tabular-nums text-foreground/90 font-medium" style={{ backgroundColor: lastBg }}>
                       {item.lastMonth ? formatPaidAmount(item.lastMonth) : "0"}
                     </td>
-                    <td className={`px-4 py-3 text-right ${last12Text}`} style={{ backgroundColor: last12Bg }}>
+                    <td className="px-4 py-2.5 text-right tabular-nums font-bold text-foreground" style={{ backgroundColor: last12Bg }}>
                       {item.last12Month ? formatPaidAmount(item.last12Month) : "0"}
                     </td>
                   </tr>
@@ -211,28 +204,28 @@ export function PaidInvoicesCard({
         </table>
       </div>
 
-      {/* Table Footer */}
+      {/* Table Footer with Pagination */}
       {!loading && sortedPaid.length > 0 && (
-        <div className="border-t border-gray-100 dark:border-slate-850 px-4 py-3 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs bg-slate-50/50 dark:bg-slate-900/30 mt-auto">
-          <div className="font-bold text-slate-700 dark:text-slate-300">
-            Grand Total: <span className="text-theme-orange ml-1">{formatPaidAmount(totalPaidAmount)}</span>
+        <div className="border-t border-border px-4 py-3 flex items-center justify-between text-xs bg-muted/30 mt-auto">
+          <div className="font-medium text-muted-foreground">
+            Grand Total: <span className="font-bold text-foreground ml-1 tabular-nums">{formatPaidAmount(totalPaidAmount)}</span>
           </div>
-          <div className="flex items-center gap-3">
-            <span className="text-slate-500">
+          <div className="flex items-center gap-2">
+            <span className="text-muted-foreground text-[11px]">
               {(paidPage - 1) * itemsPerPage + 1}-{Math.min(paidPage * itemsPerPage, sortedPaid.length)} / {sortedPaid.length}
             </span>
             <div className="flex items-center gap-1">
               <button
-                onClick={() => setPaidPage(p => Math.max(1, p - 1))}
+                onClick={() => setPaidPage((p) => Math.max(1, p - 1))}
                 disabled={paidPage === 1}
-                className="p-1 rounded border border-gray-255 dark:border-slate-700 hover:bg-white dark:hover:bg-slate-800 disabled:opacity-40 transition-colors cursor-pointer"
+                className="px-2 py-0.5 rounded border border-border hover:bg-secondary disabled:opacity-40 transition-colors cursor-pointer"
               >
                 &lt;
               </button>
               <button
-                onClick={() => setPaidPage(p => Math.min(totalPaidPages, p + 1))}
+                onClick={() => setPaidPage((p) => Math.min(totalPaidPages, p + 1))}
                 disabled={paidPage === totalPaidPages}
-                className="p-1 rounded border border-gray-255 dark:border-slate-700 hover:bg-white dark:hover:bg-slate-800 disabled:opacity-40 transition-colors cursor-pointer"
+                className="px-2 py-0.5 rounded border border-border hover:bg-secondary disabled:opacity-40 transition-colors cursor-pointer"
               >
                 &gt;
               </button>

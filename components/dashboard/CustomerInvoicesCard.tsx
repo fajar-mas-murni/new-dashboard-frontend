@@ -58,27 +58,29 @@ export function CustomerInvoicesCard({
   };
 
   return (
-    <Card className="bg-white/95 dark:bg-slate-900/95 rounded-2xl border border-gray-200/80 dark:border-slate-800/40 shadow-sm overflow-hidden flex flex-col h-[500px] mt-8 mb-4">
+    <Card className="bg-card rounded-2xl border border-border/80 shadow-xs overflow-hidden flex flex-col h-[500px] transition-colors mt-6 mb-4">
       <CardHeader className="px-5 py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 flex-shrink-0">
         <div className="flex items-center gap-2.5">
-          <FileSpreadsheet className="w-5 h-5 text-theme-orange" />
-          <CardTitle className="text-lg font-bold text-slate-800 dark:text-white flex items-center flex-wrap gap-x-1">
-            Customer Invoices{" "}
-            <span className="text-sm font-normal italic text-slate-500 tracking-normal">in home currency</span>
+          <div className="w-8 h-8 rounded-lg bg-[#FEF3D6] dark:bg-[#332A15] text-[#B47818] dark:text-[#FCD34D] border border-[#F9E5B5] dark:border-[#52411E] flex items-center justify-center flex-shrink-0">
+            <FileSpreadsheet className="w-4 h-4" />
+          </div>
+          <CardTitle className="text-base font-bold text-foreground flex items-center flex-wrap gap-x-2">
+            <span>Customer Invoices</span>
+            <span className="text-xs font-normal text-muted-foreground tracking-normal">home currency</span>
           </CardTitle>
         </div>
         <div className="flex items-center gap-2.5 w-full sm:w-auto">
           <button
             onClick={() => exportToExcel(sortedInvoices, "Customer_Invoices", columnMapping)}
             disabled={loading || sortedInvoices.length === 0}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-lg text-xs transition-colors cursor-pointer disabled:opacity-40"
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-[#E3EFE9] hover:bg-[#D4E8DC] dark:bg-[#1C2C24] dark:hover:bg-[#23382D] text-[#246A4B] dark:text-[#86EFAC] border border-[#C5DFD2] dark:border-[#2D4D3D] font-medium rounded-lg text-xs transition-colors cursor-pointer disabled:opacity-40"
             title="Export to Excel"
           >
             <Download className="w-3.5 h-3.5" />
             <span>Excel</span>
           </button>
           <div className="relative w-full sm:w-56">
-            <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+            <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
             <input
               type="text"
               placeholder="Cari invoice / customer..."
@@ -87,16 +89,16 @@ export function CustomerInvoicesCard({
                 setCustInvoicesSearch(e.target.value);
                 setCustomerInvoicesPage(1);
               }}
-              className="w-full text-xs pl-8 pr-3 py-1.5 rounded-lg border border-gray-200 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-900/80 text-slate-800 dark:text-slate-200 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-theme-orange transition-all"
+              className="w-full text-xs pl-8 pr-3 py-1.5 rounded-lg border border-border bg-secondary/50 text-foreground placeholder-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary transition-all"
             />
           </div>
         </div>
       </CardHeader>
       <Separator />
-      <div className="overflow-auto flex-1 text-slate-800 dark:text-slate-100" style={{ scrollbarGutter: "stable" }}>
+      <div className="overflow-auto flex-1 text-foreground" style={{ scrollbarGutter: "stable" }}>
         <table className="w-full text-left border-collapse whitespace-nowrap">
           <thead>
-            <tr className="bg-[#1A3644] text-white text-[10px] uppercase font-bold tracking-wider h-10 sticky top-0 z-10">
+            <tr className="bg-secondary/70 dark:bg-secondary/40 border-b border-border text-[10px] uppercase font-semibold tracking-wider h-9 sticky top-0 z-10 backdrop-blur-xs">
               {renderSortableHeader("CUSTOMER", "customer", custInvoicesSortCol, custInvoicesSortDir, (c) => handleToggleSort(c, custInvoicesSortCol, custInvoicesSortDir, setCustInvoicesSortCol, setCustInvoicesSortDir), "left")}
               {renderSortableHeader("INVOICE NO.", "invoiceNo", custInvoicesSortCol, custInvoicesSortDir, (c) => handleToggleSort(c, custInvoicesSortCol, custInvoicesSortDir, setCustInvoicesSortCol, setCustInvoicesSortDir), "left")}
               {renderSortableHeader("DATE", "date", custInvoicesSortCol, custInvoicesSortDir, (c) => handleToggleSort(c, custInvoicesSortCol, custInvoicesSortDir, setCustInvoicesSortCol, setCustInvoicesSortDir), "left")}
@@ -107,23 +109,23 @@ export function CustomerInvoicesCard({
               {renderSortableHeader("AMOUNT DUE IN HOME CURRENCY", "amountDueInHomeCurrency", custInvoicesSortCol, custInvoicesSortDir, (c) => handleToggleSort(c, custInvoicesSortCol, custInvoicesSortDir, setCustInvoicesSortCol, setCustInvoicesSortDir), "right")}
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-100 dark:divide-slate-800/50 text-xs">
+          <tbody className="divide-y divide-border/60 text-xs">
             {loading ? (
               Array.from({ length: 8 }).map((_, i) => (
-                <tr key={i} className="animate-pulse h-11">
-                  <td className="px-4 py-3"><div className="h-3 w-24 bg-slate-200 dark:bg-slate-800 rounded"></div></td>
-                  <td className="px-4 py-3"><div className="h-3 w-16 bg-slate-200 dark:bg-slate-800 rounded"></div></td>
-                  <td className="px-4 py-3"><div className="h-3 w-14 bg-slate-200 dark:bg-slate-800 rounded"></div></td>
-                  <td className="px-4 py-3"><div className="h-3 w-14 bg-slate-200 dark:bg-slate-800 rounded"></div></td>
-                  <td className="px-4 py-3"><div className="h-3 w-10 bg-slate-200 dark:bg-slate-800 rounded"></div></td>
-                  <td className="px-4 py-3"><div className="h-3 w-16 bg-slate-200 dark:bg-slate-800 rounded ml-auto"></div></td>
-                  <td className="px-4 py-3"><div className="h-3 w-16 bg-slate-200 dark:bg-slate-800 rounded ml-auto"></div></td>
-                  <td className="px-4 py-3"><div className="h-3 w-16 bg-slate-200 dark:bg-slate-800 rounded ml-auto"></div></td>
+                <tr key={i} className="animate-pulse h-10">
+                  <td className="px-4 py-2.5"><div className="h-3 w-24 bg-muted rounded"></div></td>
+                  <td className="px-4 py-2.5"><div className="h-3 w-16 bg-muted rounded"></div></td>
+                  <td className="px-4 py-2.5"><div className="h-3 w-14 bg-muted rounded"></div></td>
+                  <td className="px-4 py-2.5"><div className="h-3 w-14 bg-muted rounded"></div></td>
+                  <td className="px-4 py-2.5"><div className="h-3 w-10 bg-muted rounded"></div></td>
+                  <td className="px-4 py-2.5"><div className="h-3 w-16 bg-muted rounded ml-auto"></div></td>
+                  <td className="px-4 py-2.5"><div className="h-3 w-16 bg-muted rounded ml-auto"></div></td>
+                  <td className="px-4 py-2.5"><div className="h-3 w-16 bg-muted rounded ml-auto"></div></td>
                 </tr>
               ))
             ) : sortedInvoices.length === 0 ? (
               <tr>
-                <td colSpan={8} className="px-4 py-12 text-center text-slate-400 dark:text-slate-500 font-medium h-[352px]">
+                <td colSpan={8} className="px-4 py-12 text-center text-muted-foreground font-medium h-[352px]">
                   No data found
                 </td>
               </tr>
@@ -131,18 +133,18 @@ export function CustomerInvoicesCard({
               paginatedInvoices.map((item, idx) => (
                 <tr
                   key={idx}
-                  className="hover:bg-slate-50 dark:hover:bg-slate-800/20 transition-colors even:bg-slate-50/30 dark:even:bg-slate-800/5 h-11"
+                  className="hover:bg-secondary/60 transition-colors h-10"
                 >
-                  <td className="px-4 py-3 font-semibold text-slate-700 dark:text-slate-300 truncate max-w-[150px]" title={item.customer}>
+                  <td className="px-4 py-2.5 font-medium text-foreground truncate max-w-[150px]" title={item.customer}>
                     {item.customer}
                   </td>
-                  <td className="px-4 py-3 font-medium text-slate-650 dark:text-slate-350">{item.invoiceNo}</td>
-                  <td className="px-4 py-3 font-medium text-slate-650 dark:text-slate-350">{formatDate(item.date)}</td>
-                  <td className="px-4 py-3 font-medium text-slate-650 dark:text-slate-350">{formatDate(item.dueDate)}</td>
-                  <td className="px-4 py-3 font-medium text-slate-650 dark:text-slate-350">{item.currency}</td>
-                  <td className="px-4 py-3 text-right font-medium text-slate-650 dark:text-slate-350">{formatAmount(item.amountInCurrency)}</td>
-                  <td className="px-4 py-3 text-right font-medium text-slate-650 dark:text-slate-350">{formatAmount(item.amountInHomeCurrency)}</td>
-                  <td className="px-4 py-3 text-right font-bold text-slate-800 dark:text-slate-100">{formatAmount(item.amountDueInHomeCurrency)}</td>
+                  <td className="px-4 py-2.5 font-medium text-muted-foreground">{item.invoiceNo}</td>
+                  <td className="px-4 py-2.5 text-muted-foreground">{formatDate(item.date)}</td>
+                  <td className="px-4 py-2.5 text-muted-foreground">{formatDate(item.dueDate)}</td>
+                  <td className="px-4 py-2.5 text-muted-foreground">{item.currency}</td>
+                  <td className="px-4 py-2.5 text-right tabular-nums text-muted-foreground">{formatAmount(item.amountInCurrency)}</td>
+                  <td className="px-4 py-2.5 text-right tabular-nums text-muted-foreground">{formatAmount(item.amountInHomeCurrency)}</td>
+                  <td className="px-4 py-2.5 text-right tabular-nums font-bold text-foreground">{formatAmount(item.amountDueInHomeCurrency)}</td>
                 </tr>
               ))
             )}
@@ -152,26 +154,26 @@ export function CustomerInvoicesCard({
 
       {/* Table Footer */}
       {!loading && sortedInvoices.length > 0 && (
-        <div className="border-t border-gray-100 dark:border-slate-850 px-4 py-3 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs bg-slate-50/50 dark:bg-slate-900/30 mt-auto">
-          <div className="font-bold text-slate-700 dark:text-slate-300">
-            Grand Total: <span className="text-theme-orange ml-1">{formatAmount(totalAmtHome)}</span>
+        <div className="border-t border-border px-4 py-3 flex items-center justify-between text-xs bg-muted/30 mt-auto">
+          <div className="font-medium text-muted-foreground">
+            Grand Total: <span className="font-bold text-foreground ml-1 tabular-nums">{formatAmount(totalAmtHome)}</span>
           </div>
-          <div className="flex items-center gap-3">
-            <span className="text-slate-500">
+          <div className="flex items-center gap-2">
+            <span className="text-muted-foreground text-[11px]">
               {(customerInvoicesPage - 1) * itemsPerPage + 1}-{Math.min(customerInvoicesPage * itemsPerPage, sortedInvoices.length)} / {sortedInvoices.length}
             </span>
             <div className="flex items-center gap-1">
               <button
                 onClick={() => setCustomerInvoicesPage(p => Math.max(1, p - 1))}
                 disabled={customerInvoicesPage === 1}
-                className="p-1 rounded border border-gray-255 dark:border-slate-700 hover:bg-white dark:hover:bg-slate-800 disabled:opacity-40 transition-colors cursor-pointer"
+                className="px-2 py-0.5 rounded border border-border hover:bg-secondary disabled:opacity-40 transition-colors cursor-pointer"
               >
                 &lt;
               </button>
               <button
                 onClick={() => setCustomerInvoicesPage(p => Math.min(totalPages, p + 1))}
                 disabled={customerInvoicesPage === totalPages}
-                className="p-1 rounded border border-gray-255 dark:border-slate-700 hover:bg-white dark:hover:bg-slate-800 disabled:opacity-40 transition-colors cursor-pointer"
+                className="px-2 py-0.5 rounded border border-border hover:bg-secondary disabled:opacity-40 transition-colors cursor-pointer"
               >
                 &gt;
               </button>

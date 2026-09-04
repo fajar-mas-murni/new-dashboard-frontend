@@ -53,27 +53,31 @@ export function UmcThisMonthCard({
   };
 
   return (
-    <Card className="bg-white/95 dark:bg-slate-900/95 rounded-2xl border overflow-hidden flex flex-col h-[500px] mt-8 mb-4 transition-all duration-300 border-gray-200/80 dark:border-slate-800/40 shadow-sm">
-      <CardHeader className="px-5 py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 flex-shrink-0">
-        <div className="flex items-center gap-2.5">
-          <Receipt className="w-5 h-5 text-theme-orange" />
-          <CardTitle className="text-lg font-bold text-slate-800 dark:text-white flex items-center flex-wrap gap-x-1">
-            UMC This Month{" "}
-            <span className="text-sm font-normal italic text-slate-500 tracking-normal">in home currency</span>
-          </CardTitle>
+    <Card className="bg-card border border-border/80 rounded-2xl shadow-xs overflow-hidden flex flex-col h-[500px] mt-8 mb-4 transition-all duration-200">
+      <CardHeader className="px-5 py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 flex-shrink-0 border-b border-border/60">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-xl bg-violet-500/10 text-violet-600 dark:text-violet-400 flex items-center justify-center shrink-0">
+            <Receipt className="w-4 h-4" />
+          </div>
+          <div>
+            <CardTitle className="text-base font-semibold tracking-tight text-foreground flex items-center flex-wrap gap-x-2">
+              <span>UMC This Month</span>
+              <span className="text-xs font-normal text-muted-foreground/75">(in home currency)</span>
+            </CardTitle>
+          </div>
         </div>
         <div className="flex items-center gap-2.5 w-full sm:w-auto">
           <button
             onClick={() => exportToExcel(sortedUmc, "UMC_This_Month", columnMapping)}
             disabled={loading || sortedUmc.length === 0}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-lg text-xs transition-colors cursor-pointer disabled:opacity-40"
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-[#E3EFE9] hover:bg-[#D3E5DC] text-[#246A4B] dark:bg-[#1f3a2c] dark:text-[#7ed3a6] font-medium rounded-lg text-xs transition-colors cursor-pointer disabled:opacity-40"
             title="Export to Excel"
           >
             <Download className="w-3.5 h-3.5" />
             <span>Excel</span>
           </button>
           <div className="relative w-full sm:w-56">
-            <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+            <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground/60" />
             <input
               type="text"
               placeholder="Cari ref nbr / customer..."
@@ -82,16 +86,15 @@ export function UmcThisMonthCard({
                 setUmcSearch(e.target.value);
                 setUmcPage(1);
               }}
-              className="w-full text-xs pl-8 pr-3 py-1.5 rounded-lg border border-gray-200 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-900/80 text-slate-800 dark:text-slate-200 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-theme-orange transition-all"
+              className="w-full text-xs pl-8 pr-3 py-1.5 rounded-lg border border-border bg-secondary/50 text-foreground placeholder:text-muted-foreground/60 focus:bg-background focus:outline-none focus:ring-1 focus:ring-primary/40 focus:border-primary/40 transition-all"
             />
           </div>
         </div>
       </CardHeader>
-      <Separator />
-      <div className="overflow-auto flex-1 text-slate-800 dark:text-slate-100" style={{ scrollbarGutter: "stable" }}>
+      <div className="overflow-auto flex-1 text-foreground" style={{ scrollbarGutter: "stable" }}>
         <table className="w-full text-left border-collapse whitespace-nowrap">
           <thead>
-            <tr className="bg-[#1A3644] text-white text-[10px] uppercase font-bold tracking-wider h-10 sticky top-0 z-10">
+            <tr className="bg-secondary/70 dark:bg-secondary/40 border-b border-border text-[10px] uppercase font-semibold tracking-wider h-9 sticky top-0 z-10 backdrop-blur-xs">
               {renderSortableHeader("CUSTOMER", "customer", umcSortCol, umcSortDir, (c) => handleToggleSort(c, umcSortCol, umcSortDir, setUmcSortCol, setUmcSortDir), "left")}
               {renderSortableHeader("REF NBR", "invoiceNo", umcSortCol, umcSortDir, (c) => handleToggleSort(c, umcSortCol, umcSortDir, setUmcSortCol, setUmcSortDir), "left")}
               {renderSortableHeader("DOC DATE", "docDate", umcSortCol, umcSortDir, (c) => handleToggleSort(c, umcSortCol, umcSortDir, setUmcSortCol, setUmcSortDir), "left")}
@@ -100,21 +103,21 @@ export function UmcThisMonthCard({
               {renderSortableHeader("AMOUNT IN HOME CURRENCY", "amountInHomeCurrency", umcSortCol, umcSortDir, (c) => handleToggleSort(c, umcSortCol, umcSortDir, setUmcSortCol, setUmcSortDir), "right")}
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-100 dark:divide-slate-800/50 text-xs">
+          <tbody className="divide-y divide-border/50 text-xs">
             {loading ? (
               Array.from({ length: 8 }).map((_, i) => (
                 <tr key={i} className="animate-pulse h-11">
-                  <td className="px-4 py-3"><div className="h-3 w-24 bg-slate-200 dark:bg-slate-800 rounded"></div></td>
-                  <td className="px-4 py-3"><div className="h-3 w-16 bg-slate-200 dark:bg-slate-800 rounded"></div></td>
-                  <td className="px-4 py-3"><div className="h-3 w-14 bg-slate-200 dark:bg-slate-800 rounded"></div></td>
-                  <td className="px-4 py-3"><div className="h-3 w-10 bg-slate-200 dark:bg-slate-800 rounded"></div></td>
-                  <td className="px-4 py-3"><div className="h-3 w-16 bg-slate-200 dark:bg-slate-800 rounded ml-auto"></div></td>
-                  <td className="px-4 py-3"><div className="h-3 w-16 bg-slate-200 dark:bg-slate-800 rounded ml-auto"></div></td>
+                  <td className="px-4 py-3"><div className="h-3 w-24 bg-secondary/80 rounded"></div></td>
+                  <td className="px-4 py-3"><div className="h-3 w-16 bg-secondary/80 rounded"></div></td>
+                  <td className="px-4 py-3"><div className="h-3 w-14 bg-secondary/80 rounded"></div></td>
+                  <td className="px-4 py-3"><div className="h-3 w-10 bg-secondary/80 rounded"></div></td>
+                  <td className="px-4 py-3"><div className="h-3 w-16 bg-secondary/80 rounded ml-auto"></div></td>
+                  <td className="px-4 py-3"><div className="h-3 w-16 bg-secondary/80 rounded ml-auto"></div></td>
                 </tr>
               ))
             ) : sortedUmc.length === 0 ? (
               <tr>
-                <td colSpan={6} className="px-4 py-12 text-center text-slate-400 dark:text-slate-500 font-medium h-[352px]">
+                <td colSpan={6} className="px-4 py-12 text-center text-muted-foreground font-medium h-[352px]">
                   No data found
                 </td>
               </tr>
@@ -122,16 +125,16 @@ export function UmcThisMonthCard({
               paginatedUmc.map((item, idx) => (
                 <tr
                   key={idx}
-                  className="hover:bg-slate-50 dark:hover:bg-slate-800/20 transition-colors even:bg-slate-50/30 dark:even:bg-slate-800/5 h-11"
+                  className="hover:bg-secondary/40 transition-colors h-11"
                 >
-                  <td className="px-4 py-3 font-semibold text-slate-700 dark:text-slate-300 truncate max-w-[200px]" title={item.customer}>
+                  <td className="px-4 py-3 font-medium text-foreground truncate max-w-[200px]" title={item.customer}>
                     {item.customer}
                   </td>
-                  <td className="px-4 py-3 font-medium text-slate-650 dark:text-slate-350">{item.invoiceNo}</td>
-                  <td className="px-4 py-3 font-medium text-slate-650 dark:text-slate-350">{formatDate(item.docDate)}</td>
-                  <td className="px-4 py-3 font-medium text-slate-650 dark:text-slate-350">{item.currency || "-"}</td>
-                  <td className="px-4 py-3 text-right font-medium text-slate-650 dark:text-slate-350">{formatAmount(item.amountInCurrency)}</td>
-                  <td className="px-4 py-3 text-right font-bold text-slate-800 dark:text-slate-100">{formatAmount(item.amountInHomeCurrency)}</td>
+                  <td className="px-4 py-3 text-muted-foreground font-mono">{item.invoiceNo}</td>
+                  <td className="px-4 py-3 text-muted-foreground font-mono">{formatDate(item.docDate)}</td>
+                  <td className="px-4 py-3 text-muted-foreground font-mono">{item.currency || "-"}</td>
+                  <td className="px-4 py-3 text-right font-mono tabular-nums text-muted-foreground">{formatAmount(item.amountInCurrency)}</td>
+                  <td className="px-4 py-3 text-right font-mono tabular-nums font-medium text-foreground">{formatAmount(item.amountInHomeCurrency)}</td>
                 </tr>
               ))
             )}
@@ -141,26 +144,26 @@ export function UmcThisMonthCard({
 
       {/* Table Footer */}
       {!loading && sortedUmc.length > 0 && (
-        <div className="border-t border-gray-100 dark:border-slate-850 px-4 py-3 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs bg-slate-50/50 dark:bg-slate-900/30 mt-auto">
-          <div className="font-bold text-slate-700 dark:text-slate-300">
-            Grand Total: <span className="text-theme-orange ml-1">{formatAmount(totalAmountHome)}</span>
+        <div className="border-t border-border px-4 py-3 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs bg-secondary/20 mt-auto">
+          <div className="font-medium text-muted-foreground">
+            Grand Total: <span className="text-primary font-semibold tabular-nums ml-1">{formatAmount(totalAmountHome)}</span>
           </div>
           <div className="flex items-center gap-3">
-            <span className="text-slate-500">
+            <span className="text-muted-foreground tabular-nums">
               {(umcPage - 1) * itemsPerPage + 1}-{Math.min(umcPage * itemsPerPage, sortedUmc.length)} / {sortedUmc.length}
             </span>
             <div className="flex items-center gap-1">
               <button
                 onClick={() => setUmcPage(p => Math.max(1, p - 1))}
                 disabled={umcPage === 1}
-                className="p-1 rounded border border-gray-255 dark:border-slate-700 hover:bg-white dark:hover:bg-slate-800 disabled:opacity-40 transition-colors cursor-pointer"
+                className="w-7 h-7 rounded-md border border-border hover:bg-secondary disabled:opacity-30 transition-colors cursor-pointer flex items-center justify-center text-foreground"
               >
                 &lt;
               </button>
               <button
                 onClick={() => setUmcPage(p => Math.min(totalPages, p + 1))}
                 disabled={umcPage === totalPages}
-                className="p-1 rounded border border-gray-255 dark:border-slate-700 hover:bg-white dark:hover:bg-slate-800 disabled:opacity-40 transition-colors cursor-pointer"
+                className="w-7 h-7 rounded-md border border-border hover:bg-secondary disabled:opacity-30 transition-colors cursor-pointer flex items-center justify-center text-foreground"
               >
                 &gt;
               </button>
