@@ -137,7 +137,7 @@ export function UnpaidInvoicesCard({
             ) : top10Unpaid.length === 0 ? (
               <tr>
                 <td colSpan={7} className="px-4 py-12 text-center text-muted-foreground font-medium h-[352px]">
-                  No data found
+                  Data tidak ditemukan
                 </td>
               </tr>
             ) : (

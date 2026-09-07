@@ -118,7 +118,7 @@ export function UmcThisMonthCard({
             ) : sortedUmc.length === 0 ? (
               <tr>
                 <td colSpan={6} className="px-4 py-12 text-center text-muted-foreground font-medium h-[352px]">
-                  No data found
+                  Data tidak ditemukan
                 </td>
               </tr>
             ) : (

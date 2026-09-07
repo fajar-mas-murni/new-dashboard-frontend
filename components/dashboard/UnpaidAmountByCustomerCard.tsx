@@ -95,8 +95,6 @@ export function UnpaidAmountByCustomerCard({
     (item) => customer === "all" || item.customer === customer
   );
 
-  if (filteredTop10.length === 0) return null;
-
   return (
     <Card className="bg-card rounded-2xl border border-border/80 shadow-xs overflow-hidden relative transition-colors duration-300">
       <CardHeader className="px-6 py-4 flex flex-row items-center gap-3">
@@ -117,7 +115,12 @@ export function UnpaidAmountByCustomerCard({
       </CardHeader>
       <Separator />
       <CardContent className="p-6">
-        <div className="flex flex-col lg:flex-row gap-8 items-stretch">
+        {filteredTop10.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-16 text-center text-muted-foreground">
+            <p className="text-sm font-medium">Data tidak ditemukan</p>
+          </div>
+        ) : (
+          <div className="flex flex-col lg:flex-row gap-8 items-stretch">
           {/* Left Column: Horizontal Bar Chart */}
           <div className="flex-1 flex flex-col justify-between pr-0 lg:pr-6 pb-6 lg:pb-0">
             <div className="space-y-3">
@@ -244,7 +247,8 @@ export function UnpaidAmountByCustomerCard({
             })()}
           </div>
         </div>
-      </CardContent>
+      )}
+    </CardContent>
     </Card>
   );
 }

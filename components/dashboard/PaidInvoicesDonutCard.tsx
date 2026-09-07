@@ -84,7 +84,7 @@ export function PaidInvoicesDonutCard({
           if (groupedPaid.length === 0) {
             return (
               <div className="text-center py-12 text-muted-foreground font-medium">
-                No data found
+                Data tidak ditemukan
               </div>
             );
           }
