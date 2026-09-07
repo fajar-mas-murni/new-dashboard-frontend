@@ -9,6 +9,7 @@ export interface SectionLoadingState {
   paidVsUnpaid: boolean;
   customerInvoices: boolean;
   umc: boolean;
+  arOther: boolean;
 }
 
 const initialData: ArSummaryResponse = {
@@ -22,6 +23,101 @@ const initialData: ArSummaryResponse = {
   "all-umc-this-month": [],
 };
 
+function processRawArOther(rawItems: any[]) {
+  const summaryTemp = new Map<string, any>();
+  const customerTemp = new Map<string, any>();
+  const customerMap = new Map<string, any>();
+
+  rawItems.forEach((dt: any) => {
+    const branch = String(dt["Branch"] || "Unknown");
+    const group = String(dt["SalesGroup"] || dt["Group"] || "Unknown");
+    const customer = String(dt["CustomerName"] || "Unknown");
+    const rate = parseFloat(dt["Rate"] || 1);
+    const balance = parseFloat(dt["BalanceIDR"] || 0);
+
+    const key = customer + "|" + branch + "|" + group;
+    if (!summaryTemp.has(key)) {
+      summaryTemp.set(key, {
+        branch,
+        group,
+        customer,
+        "unpaid-invoice": 0,
+        "overdue-amount": 0,
+        "overdue-30-plus": 0,
+        "overdue-90-plus": 0,
+      });
+    }
+    const sumItem = summaryTemp.get(key);
+    sumItem["unpaid-invoice"] += balance;
+    sumItem["overdue-amount"] += (
+      (parseFloat(dt["Current"] || 0) * rate) +
+      (parseFloat(dt["_130"] || 0) * rate)
+    );
+    sumItem["overdue-30-plus"] += (
+      (parseFloat(dt["_3160"] || 0) * rate) +
+      (parseFloat(dt["_6090"] || 0) * rate)
+    );
+    sumItem["overdue-90-plus"] += (
+      (parseFloat(dt["_90180"] || 0) * rate) +
+      (parseFloat(dt["over180"] || 0) * rate)
+    );
+
+    if (customerTemp.has(key)) {
+      customerTemp.get(key).amount += balance;
+    } else {
+      customerTemp.set(key, { customer, branch, group, amount: balance });
+    }
+
+    const current = (parseFloat(dt["Current"] || 0) * rate) || 0;
+    const val1_30 = (parseFloat(dt["_130"] || 0) * rate) || 0;
+    const val31_60 = (parseFloat(dt["_3160"] || 0) * rate) || 0;
+    const val61_90 = (parseFloat(dt["_6090"] || 0) * rate) || 0;
+    const val91_180 = (parseFloat(dt["_90180"] || 0) * rate) || 0;
+    const val_over180 = (parseFloat(dt["over180"] || 0) * rate) || 0;
+
+    if (customerMap.has(key)) {
+      const existing = customerMap.get(key);
+      existing.current += current;
+      existing["1-30"] += val1_30;
+      existing["31-60"] += val31_60;
+      existing["61-90"] += val61_90;
+      existing["91-180"] += val91_180;
+      existing["over180"] += val_over180;
+      existing.amountDue += balance;
+    } else {
+      customerMap.set(key, {
+        customer,
+        branch,
+        group,
+        current,
+        "1-30": val1_30,
+        "31-60": val31_60,
+        "61-90": val61_90,
+        "91-180": val91_180,
+        "over180": val_over180,
+        amountDue: balance,
+      });
+    }
+  });
+
+  const summaryUnpaid = rawItems.map((dt: any) => ({
+    customer: dt["CustomerName"] || "Unknown",
+    branch: String(dt["Branch"] || "Unknown"),
+    group: String(dt["SalesGroup"] || "Unknown"),
+    number: dt["RefNbr"] || dt["DocumentNo"] || "",
+    date: dt["Date"],
+    dueDate: dt["DueDate"],
+    amountDue: parseFloat(dt["BalanceIDR"] || 0),
+  }));
+
+  return {
+    summary: Array.from(summaryTemp.values()),
+    "top-10-unpaid-customers": Array.from(customerTemp.values()),
+    "summary-customer": Array.from(customerMap.values()),
+    "summary-unpaid": summaryUnpaid,
+  };
+}
+
 export function useArData() {
   const getDefaultStartDate = () => DEFAULT_START_DATE;
 
@@ -33,12 +129,14 @@ export function useArData() {
   };
 
   const [data, setData] = useState<ArSummaryResponse>(initialData);
+  const [arOtherData, setArOtherData] = useState<ArSummaryResponse>(initialData);
   const [sectionLoading, setSectionLoading] = useState<SectionLoadingState>({
     summary: true,
     paidSummary: true,
     paidVsUnpaid: true,
     customerInvoices: true,
     umc: true,
+    arOther: true,
   });
   const [error, setError] = useState<string | null>(null);
   const [mounted, setMounted] = useState<boolean>(false);
@@ -65,6 +163,7 @@ export function useArData() {
       paidVsUnpaid: true,
       customerInvoices: true,
       umc: true,
+      arOther: true,
     });
 
     const params = new URLSearchParams();
@@ -166,17 +265,49 @@ export function useArData() {
       setSectionLoading(prev => ({ ...prev, umc: false }));
     })();
 
+    // 6. Fetch AR Other Summary
+    (async () => {
+      try {
+        const otherRes = await fetchJson(`/ar-other${queryString}`);
+        if (currentFetchId !== fetchIdRef.current) return;
+
+        if (otherRes) {
+          if (Array.isArray(otherRes)) {
+            const processed = processRawArOther(otherRes);
+            setArOtherData({
+              ...initialData,
+              ...processed,
+            });
+          } else if (typeof otherRes === "object") {
+            setArOtherData({
+              ...initialData,
+              summary: otherRes.summary || [],
+              "top-10-unpaid-customers": otherRes["top-10-unpaid-customers"] || [],
+              "summary-customer": otherRes["summary-customer"] || [],
+              "summary-unpaid": otherRes["summary-unpaid"] || [],
+            });
+          }
+        }
+      } catch (err: any) {
+        console.warn("Failed to fetch AR Other:", err.message);
+      } finally {
+        if (currentFetchId === fetchIdRef.current) {
+          setSectionLoading(prev => ({ ...prev, arOther: false }));
+        }
+      }
+    })();
+
   }, [startDate, endDate]);
 
   useEffect(() => {
     fetchData();
   }, [fetchData]);
 
-  // Overall loading: true if summary is still loading or if everything is loading
+  // Overall loading: true if summary is still loading
   const loading = sectionLoading.summary;
   const isAnyLoading = Object.values(sectionLoading).some(Boolean);
 
-  // Derived unique customer names for filter dropdown
+  // Derived unique customer names for filter dropdown (including AR Other)
   const customerList = useMemo(() => {
     const names = new Set<string>();
 
@@ -194,10 +325,17 @@ export function useArData() {
       }
     });
 
-    return Array.from(names).sort((a, b) => a.localeCompare(b));
-  }, [data, category]);
+    const otherCust = arOtherData["summary-customer"] || [];
+    otherCust.forEach(item => {
+      if (item.customer && isCustomerInCategory(item.customer, category)) {
+        names.add(item.customer);
+      }
+    });
 
-  // Derived unique branches for filter dropdown
+    return Array.from(names).sort((a, b) => a.localeCompare(b));
+  }, [data, arOtherData, category]);
+
+  // Derived unique branches for filter dropdown (including AR Other)
   const branchList = useMemo(() => {
     const branches = new Set<string>();
 
@@ -206,10 +344,15 @@ export function useArData() {
       if (item.branch && item.branch !== "Unknown") branches.add(String(item.branch));
     });
 
-    return Array.from(branches).sort((a, b) => a.localeCompare(b));
-  }, [data]);
+    const otherCust = arOtherData["summary-customer"] || [];
+    otherCust.forEach(item => {
+      if (item.branch && item.branch !== "Unknown") branches.add(String(item.branch));
+    });
 
-  // Derived unique groups for filter dropdown
+    return Array.from(branches).sort((a, b) => a.localeCompare(b));
+  }, [data, arOtherData]);
+
+  // Derived unique groups for filter dropdown (including AR Other)
   const groupList = useMemo(() => {
     const groups = new Set<string>();
     let hasUnknown = false;
@@ -229,15 +372,21 @@ export function useArData() {
     (data["paid-invoices-summary"] || []).forEach(item => checkItem(item.group));
     (data["paid-vs-unpaid-monthly"] || []).forEach(item => checkItem(item.group));
 
+    (arOtherData["summary"] || []).forEach(item => checkItem(item.group));
+    (arOtherData["top-10-unpaid-customers"] || []).forEach(item => checkItem(item.group));
+    (arOtherData["summary-customer"] || []).forEach(item => checkItem(item.group));
+    (arOtherData["summary-unpaid"] || []).forEach(item => checkItem(item.group));
+
     const sortedGroups = Array.from(groups).sort((a, b) => a.localeCompare(b));
     if (hasUnknown) {
       sortedGroups.push("Unknown");
     }
     return sortedGroups;
-  }, [data]);
+  }, [data, arOtherData]);
 
   return {
     data,
+    arOtherData,
     loading,
     isAnyLoading,
     sectionLoading,

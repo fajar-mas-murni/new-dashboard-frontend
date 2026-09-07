@@ -18,6 +18,9 @@ interface UnpaidInvoicesCardProps {
   customer: string;
   category: FilterCategory;
   setCustomer: (cust: string) => void;
+  title?: string;
+  badge?: string;
+  exportFileName?: string;
 }
 
 export function UnpaidInvoicesCard({
@@ -28,6 +31,9 @@ export function UnpaidInvoicesCard({
   customer,
   category,
   setCustomer,
+  title = "Unpaid Invoices (Top 10)",
+  badge,
+  exportFileName = "Unpaid_Invoices",
 }: UnpaidInvoicesCardProps) {
   const [unpaidSearch, setUnpaidSearch] = useState<string>("");
   const [unpaidSortCol, setUnpaidSortCol] = useState<keyof UnpaidInvoice>("amountDue");
@@ -82,12 +88,17 @@ export function UnpaidInvoicesCard({
             <Receipt className="w-4 h-4" />
           </div>
           <CardTitle className="text-base font-bold text-foreground flex items-center flex-wrap gap-x-2">
-            <span>Unpaid Invoices (Top 10)</span>
+            <span>{title}</span>
+            {badge && (
+              <span className="text-[10px] uppercase font-semibold px-1.5 py-0.5 rounded bg-muted text-muted-foreground border border-border/60">
+                {badge}
+              </span>
+            )}
             <span className="text-xs font-normal text-muted-foreground tracking-normal">home currency</span>
           </CardTitle>
         </div>
         <button
-          onClick={() => exportToExcel(sortedUnpaid, "Unpaid_Invoices", columnMapping)}
+          onClick={() => exportToExcel(sortedUnpaid, exportFileName, columnMapping)}
           disabled={loading || sortedUnpaid.length === 0}
           className="flex items-center gap-1.5 px-3 py-1.5 bg-[#E3EFE9] hover:bg-[#D4E8DC] dark:bg-[#1C2C24] dark:hover:bg-[#23382D] text-[#246A4B] dark:text-[#86EFAC] border border-[#C5DFD2] dark:border-[#2D4D3D] font-medium rounded-lg text-xs transition-colors cursor-pointer disabled:opacity-40"
           title="Export to Excel"

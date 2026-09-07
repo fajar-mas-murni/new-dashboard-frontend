@@ -17,6 +17,7 @@ import { UmcThisMonthCard } from "@/components/dashboard/UmcThisMonthCard";
 export default function Page() {
   const {
     data,
+    arOtherData,
     loading,
     isAnyLoading,
     sectionLoading,
@@ -130,6 +131,7 @@ export default function Page() {
           customer={customer}
           category={category}
           setCustomer={setCustomer}
+          badge="AR TRADE"
         />
 
         {/* Summary Customers & Unpaid Invoices Top 10 Datatables */}
@@ -142,6 +144,7 @@ export default function Page() {
             customer={customer}
             category={category}
             setCustomer={setCustomer}
+            badge="AR TRADE"
           />
           <UnpaidInvoicesCard
             data={data}
@@ -151,6 +154,7 @@ export default function Page() {
             customer={customer}
             category={category}
             setCustomer={setCustomer}
+            badge="AR TRADE"
           />
         </div>
 
@@ -201,6 +205,48 @@ export default function Page() {
           customer={customer}
           category={category}
         />
+
+        {/* AR Other: Unpaid Invoices Amount by Customer (Top 10 Chart Card) */}
+        <UnpaidAmountByCustomerCard
+          data={arOtherData}
+          loading={sectionLoading.arOther}
+          branch={branch}
+          group={group}
+          customer={customer}
+          category={category}
+          setCustomer={setCustomer}
+          title="Unpaid Invoices by Customer (Top 10) - AR Other"
+          badge="AR OTHER"
+          donutCenterLabel="OTHER"
+        />
+
+        {/* AR Other: Summary Customers & Unpaid Invoices Top 10 Datatables */}
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+          <SummaryCustomersCard
+            data={arOtherData}
+            loading={sectionLoading.arOther}
+            branch={branch}
+            group={group}
+            customer={customer}
+            category={category}
+            setCustomer={setCustomer}
+            title="Summary Customers (Top 10) - AR Other"
+            badge="AR OTHER"
+            exportFileName="Summary_Customers_AR_Other"
+          />
+          <UnpaidInvoicesCard
+            data={arOtherData}
+            loading={sectionLoading.arOther}
+            branch={branch}
+            group={group}
+            customer={customer}
+            category={category}
+            setCustomer={setCustomer}
+            title="Unpaid Invoices (Top 10) - AR Other"
+            badge="AR OTHER"
+            exportFileName="Unpaid_Invoices_AR_Other"
+          />
+        </div>
       </div>
     </div>
   );

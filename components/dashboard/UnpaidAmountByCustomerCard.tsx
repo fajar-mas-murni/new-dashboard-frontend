@@ -14,6 +14,9 @@ interface UnpaidAmountByCustomerCardProps {
   customer: string;
   category: FilterCategory;
   setCustomer: (cust: string) => void;
+  title?: string;
+  badge?: string;
+  donutCenterLabel?: string;
 }
 
 export function UnpaidAmountByCustomerCard({
@@ -24,6 +27,9 @@ export function UnpaidAmountByCustomerCard({
   customer,
   category,
   setCustomer,
+  title = "Unpaid Invoices by Customer (Top 10)",
+  badge,
+  donutCenterLabel = "AR",
 }: UnpaidAmountByCustomerCardProps) {
   if (loading) {
     return (
@@ -98,7 +104,12 @@ export function UnpaidAmountByCustomerCard({
           <BarChart3 className="w-4 h-4" />
         </div>
         <CardTitle className="text-base font-bold text-foreground flex items-center flex-wrap gap-x-2">
-          <span>Unpaid Invoices by Customer (Top 10)</span>
+          <span>{title}</span>
+          {badge && (
+            <span className="text-[10px] uppercase font-semibold px-1.5 py-0.5 rounded bg-muted text-muted-foreground border border-border/60">
+              {badge}
+            </span>
+          )}
           <span className="text-xs font-normal text-muted-foreground tracking-normal">
             home currency
           </span>
@@ -195,7 +206,7 @@ export function UnpaidAmountByCustomerCard({
                         Top 10
                       </span>
                       <span className="text-xl font-extrabold text-foreground mt-0.5">
-                        AR
+                        {donutCenterLabel}
                       </span>
                     </div>
                   </div>
